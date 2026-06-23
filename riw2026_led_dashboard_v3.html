@@ -744,9 +744,10 @@ async function fetchSheet(tabName) {
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const data = await res.json();
   const rows = data.values || [];
-  // Strip header row(s): find first row where col[0] is a number or non-empty after header
-  // We return all rows after the first (header)
-  return rows.slice(1).filter(r => r.some(c => (c||'').toString().trim() !== ''));
+  // Planilha tem 4 linhas de cabeçalho antes dos dados:
+  // Linha 1: título, Linha 2: legenda status, Linha 3: seção, Linha 4: cabeçalho colunas
+  // Dados começam na linha 5 (índice 4)
+  return rows.slice(4).filter(r => r.some(c => (c||'').toString().trim() !== ''));
 }
 
 // ═══════════════════════════════════════════════════════════════
