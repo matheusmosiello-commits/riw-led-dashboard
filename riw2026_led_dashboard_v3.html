@@ -483,12 +483,12 @@
               <th>M²</th>
               <th>Pixel</th>
               <th>Tipo de Conteúdo</th>
+              <th>Naming Right</th>
               <th>Patrocinadores (logos)</th>
               <th>Link Logos</th>
               <th>Patrocinadores (vídeo)</th>
-              <th>Naming Right</th>
-              <th>Fornecedor</th>
               <th>Link Conteúdo</th>
+              <th>Fornecedor</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -530,12 +530,12 @@
               <th>M²</th>
               <th>Pixel</th>
               <th>Tipo de Conteúdo</th>
+              <th>Naming Right</th>
               <th>Patrocinadores (logos)</th>
               <th>Link Logos</th>
               <th>Patrocinadores (vídeo)</th>
-              <th>Naming Right</th>
-              <th>Fornecedor</th>
               <th>Link Conteúdo</th>
+              <th>Fornecedor</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -571,20 +571,17 @@
           <thead>
             <tr>
               <th>Nº</th>
-              <th>Espaço</th>
               <th>Local</th>
               <th>Nome do Totem</th>
               <th>Dimensões</th>
               <th>Pixel</th>
               <th>Tipo de Conteúdo</th>
+              <th>Naming Right</th>
               <th>Patrocinadores (logos)</th>
               <th>Patrocinadores (vídeo)</th>
-              <th>Naming Right</th>
-              <th>Fornecedor</th>
-              <th>Responsável</th>
               <th>Link Conteúdo</th>
+              <th>Fornecedor</th>
               <th>Status</th>
-              <th>Obs</th>
             </tr>
           </thead>
           <tbody id="tbody-totens"></tbody>
@@ -744,10 +741,10 @@ async function fetchSheet(tabName) {
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const data = await res.json();
   const rows = data.values || [];
-  // Planilha tem 4 linhas de cabeçalho antes dos dados:
-  // Linha 1: título, Linha 2: legenda status, Linha 3: seção, Linha 4: cabeçalho colunas
-  // Dados começam na linha 5 (índice 4)
-  return rows.slice(4).filter(r => r.some(c => (c||'').toString().trim() !== ''));
+  // Planilha tem 3 linhas de cabeçalho antes dos dados:
+  // Linha 1: título, Linha 2: seção, Linha 3: cabeçalho colunas
+  // Dados começam na linha 4 (índice 3)
+  return rows.slice(3).filter(r => r.some(c => (c||'').toString().trim() !== ''));
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -872,6 +869,7 @@ function renderPalcos() {
     return;
   }
 
+  // Colunas: Nº(0) | LOCAL(1) | Nº PALCO(2) | PALCO/LED(3) | DIMENSÕES(4) | M²(5) | PIXEL(6) | TIPO(7) | NAMING RIGHT(8) | PATS logos(9) | LINK LOGOS(10) | PATS video(11) | LINK CONTEÚDO(12) | FORNECEDOR(13) | STATUS(14)
   document.getElementById('tbody-palcos').innerHTML = rows.map(r => `
     <tr>
       <td class="td-num">${col(r,0)}</td>
@@ -882,12 +880,12 @@ function renderPalcos() {
       <td>${col(r,5)}</td>
       <td>${col(r,6)}</td>
       <td>${col(r,7)}</td>
-      <td>${col(r,8)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,9))}</td>
-      <td>${col(r,10)}</td>
-      <td>${colRaw(r,11)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
-      <td>${col(r,12)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,13))}</td>
+      <td>${colRaw(r,8)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
+      <td>${col(r,9)}</td>
+      <td class="link-cell">${linkCell(colRaw(r,10))}</td>
+      <td>${col(r,11)}</td>
+      <td class="link-cell">${linkCell(colRaw(r,12))}</td>
+      <td>${col(r,13)}</td>
       <td>${statusBadge('palcos', r)}</td>
     </tr>
   `).join('');
@@ -926,6 +924,7 @@ function renderLeds() {
     return;
   }
 
+  // Colunas: Nº(0) | LOCAL(1) | PALCO/LED(2) | DIMENSÕES(3) | M²(4) | PIXEL(5) | TIPO(6) | NAMING RIGHT(7) | PATS logos(8) | LINK LOGOS(9) | PATS video(10) | LINK CONTEÚDO(11) | FORNECEDOR(12) | STATUS(13)
   document.getElementById('tbody-leds').innerHTML = rows.map(r => `
     <tr>
       <td class="td-num">${col(r,0)}</td>
@@ -935,12 +934,12 @@ function renderLeds() {
       <td>${col(r,4)}</td>
       <td>${col(r,5)}</td>
       <td>${col(r,6)}</td>
-      <td>${col(r,7)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,8))}</td>
-      <td>${col(r,9)}</td>
-      <td>${colRaw(r,10)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
-      <td>${col(r,11)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,12))}</td>
+      <td>${colRaw(r,7)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
+      <td>${col(r,8)}</td>
+      <td class="link-cell">${linkCell(colRaw(r,9))}</td>
+      <td>${col(r,10)}</td>
+      <td class="link-cell">${linkCell(colRaw(r,11))}</td>
+      <td>${col(r,12)}</td>
       <td>${statusBadge('leds', r)}</td>
     </tr>
   `).join('');
@@ -979,23 +978,21 @@ function renderTotens() {
     return;
   }
 
+  // Colunas: Nº(0) | LOCAL(1) | NOME TOTEM(2) | DIMENSÕES(3) | PIXEL(4) | TIPO(5) | NAMING RIGHT(6) | PATS logos(7) | PATS video(8) | LINK CONTEÚDO(9) | FORNECEDOR(10) | STATUS(11)
   document.getElementById('tbody-totens').innerHTML = rows.map(r => `
     <tr>
       <td class="td-num">${col(r,0)}</td>
       <td>${col(r,1)}</td>
-      <td>${col(r,2)}</td>
-      <td class="td-bold">${col(r,3)}</td>
+      <td class="td-bold">${col(r,2)}</td>
+      <td>${col(r,3)}</td>
       <td>${col(r,4)}</td>
       <td>${col(r,5)}</td>
-      <td>${col(r,6)}</td>
+      <td>${colRaw(r,6)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
       <td>${col(r,7)}</td>
       <td>${col(r,8)}</td>
-      <td>${colRaw(r,9)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
+      <td class="link-cell">${linkCell(colRaw(r,9))}</td>
       <td>${col(r,10)}</td>
-      <td>${col(r,11)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,12))}</td>
       <td>${statusBadge('totens', r)}</td>
-      <td style="max-width:180px;white-space:normal;font-size:12px;color:var(--text-muted)">${col(r,14)}</td>
     </tr>
   `).join('');
 }
