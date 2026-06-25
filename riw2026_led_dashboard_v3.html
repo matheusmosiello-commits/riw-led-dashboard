@@ -78,7 +78,9 @@
   .table-scroll{overflow-x:auto;}
   table{width:100%;border-collapse:collapse;}
   th{background:var(--surface2);color:var(--text-dim);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
-  td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:default;}
+  td.expanded{white-space:normal;overflow:visible;max-width:320px;word-break:break-word;background:var(--surface2) !important;cursor:default;}
+  td.expandable:hover{color:var(--text);text-decoration:underline dotted var(--text-dim);cursor:pointer;}
   tr:last-child td{border-bottom:none;}
   tr:hover td{background:rgba(255,255,255,.02);}
   .td-num{color:var(--text-dim);font-size:12px;width:40px;}
@@ -436,6 +438,20 @@ function esc(str){ return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').r
 function col(row,i){ return esc((row[i]||'').toString().trim()); }
 function colRaw(row,i){ return (row[i]||'').toString().trim(); }
 
+// Célula com expand ao clicar se o conteúdo for longo
+function colCell(row,i,bold=false){
+  const val = (row[i]||'').toString().trim();
+  if(!val) return `<td></td>`;
+  const cls = (bold?'td-bold ':'')+( val.length>30?'expandable':'');
+  return `<td class="${cls.trim()}" onclick="toggleExpand(this)">${esc(val)}</td>`;
+}
+
+function toggleExpand(td){
+  if(td.classList.contains('expandable')||td.classList.contains('expanded')){
+    td.classList.toggle('expanded');
+  }
+}
+
 function statusClass(s){
   const map={'A PRODUZIR':'produzir','EM ANDAMENTO':'andamento','EM REVISÃO':'revisao','APROVADO':'aprovado','ENTREGUE':'entregue'};
   return map[s]||'produzir';
@@ -485,16 +501,16 @@ function renderPalcos(){
   document.getElementById('tbody-palcos').innerHTML=rows.map(r=>`
     <tr>
       <td class="td-num">${col(r,0)}</td>
-      <td>${col(r,1)}</td>
-      <td>${col(r,2)}</td>
-      <td class="td-bold">${col(r,3)}</td>
-      <td>${col(r,4)}</td>
-      <td>${col(r,5)}</td>
-      <td>${col(r,6)}</td>
-      <td>${col(r,7)}</td>
+      ${colCell(r,1)}
+      ${colCell(r,2)}
+      ${colCell(r,3,true)}
+      ${colCell(r,4)}
+      ${colCell(r,5)}
+      ${colCell(r,6)}
+      ${colCell(r,7)}
       <td>${colRaw(r,8)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
       <td class="link-cell">${linkCell(colRaw(r,9))}</td>
-      <td>${col(r,10)}</td>
+      ${colCell(r,10)}
       <td>${statusBadge('palcos',r)}</td>
     </tr>`).join('');
 }
@@ -518,16 +534,16 @@ function renderLeds(){
   document.getElementById('tbody-leds').innerHTML=rows.map(r=>`
     <tr>
       <td class="td-num">${col(r,0)}</td>
-      <td>${col(r,1)}</td>
-      <td class="td-bold">${col(r,2)}</td>
-      <td>${col(r,3)}</td>
-      <td>${col(r,4)}</td>
-      <td>${col(r,5)}</td>
-      <td>${col(r,6)}</td>
+      ${colCell(r,1)}
+      ${colCell(r,2,true)}
+      ${colCell(r,3)}
+      ${colCell(r,4)}
+      ${colCell(r,5)}
+      ${colCell(r,6)}
       <td>${colRaw(r,7)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
-      <td>${col(r,8)}</td>
+      ${colCell(r,8)}
       <td class="link-cell">${linkCell(colRaw(r,9))}</td>
-      <td>${col(r,10)}</td>
+      ${colCell(r,10)}
       <td>${statusBadge('leds',r)}</td>
     </tr>`).join('');
 }
@@ -552,15 +568,15 @@ function renderTotens(){
   document.getElementById('tbody-totens').innerHTML=rows.map(r=>`
     <tr>
       <td class="td-num">${col(r,0)}</td>
-      <td>${col(r,1)}</td>
-      <td class="td-bold">${col(r,2)}</td>
-      <td>${col(r,3)}</td>
-      <td>${col(r,4)}</td>
-      <td>${col(r,5)}</td>
+      ${colCell(r,1)}
+      ${colCell(r,2,true)}
+      ${colCell(r,3)}
+      ${colCell(r,4)}
+      ${colCell(r,5)}
       <td>${colRaw(r,6)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
-      <td>${col(r,7)}</td>
+      ${colCell(r,7)}
       <td class="link-cell">${linkCell(colRaw(r,8))}</td>
-      <td>${col(r,9)}</td>
+      ${colCell(r,9)}
       <td>${statusBadge('totens',r)}</td>
     </tr>`).join('');
 }
@@ -582,11 +598,11 @@ function renderBarraLogos(){
 
   document.getElementById('tbody-barralogos').innerHTML=rows.map(r=>`
     <tr>
-      <td class="td-bold">${col(r,0)}</td>
-      <td>${col(r,1)}</td>
-      <td>${col(r,2)}</td>
-      <td>${col(r,3)}</td>
-      <td>${col(r,4)}</td>
+      ${colCell(r,0,true)}
+      ${colCell(r,1)}
+      ${colCell(r,2)}
+      ${colCell(r,3)}
+      ${colCell(r,4)}
       <td class="link-cell">${linkCell(colRaw(r,5))}</td>
       <td>${statusBadge('barralogos',r)}</td>
     </tr>`).join('');
