@@ -7,388 +7,136 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-
   :root {
-    --bg: #0a0c10;
-    --surface: #111318;
-    --surface2: #181c24;
-    --border: #1e2330;
-    --border-bright: #2a3042;
-    --text: #e8eaf0;
-    --text-muted: #7a8099;
-    --text-dim: #4a5068;
-    --accent: #4f7cff;
-    --green: #22c55e;
-    --green-bg: rgba(34,197,94,0.1);
-    --yellow: #f59e0b;
-    --yellow-bg: rgba(245,158,11,0.1);
-    --orange: #f97316;
-    --orange-bg: rgba(249,115,22,0.1);
-    --blue: #3b82f6;
-    --blue-bg: rgba(59,130,246,0.1);
-    --purple: #a855f7;
-    --purple-bg: rgba(168,85,247,0.1);
+    --bg:#0a0c10;--surface:#111318;--surface2:#181c24;--border:#1e2330;--border-bright:#2a3042;
+    --text:#e8eaf0;--text-muted:#7a8099;--text-dim:#4a5068;--accent:#4f7cff;
+    --green:#22c55e;--green-bg:rgba(34,197,94,0.1);
+    --yellow:#f59e0b;--yellow-bg:rgba(245,158,11,0.1);
+    --orange:#f97316;--orange-bg:rgba(249,115,22,0.1);
+    --blue:#3b82f6;--blue-bg:rgba(59,130,246,0.1);
+    --purple:#a855f7;--purple-bg:rgba(168,85,247,0.1);
   }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;}
+  .header-left{display:flex;align-items:center;gap:12px;}
+  .logo-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);}
+  .header-title{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;letter-spacing:.02em;}
+  .header-subtitle{font-size:12px;color:var(--text-muted);margin-left:4px;}
+  .header-right{display:flex;align-items:center;gap:10px;}
+  .btn-header{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border-bright);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--text-muted);text-decoration:none;cursor:pointer;font-family:inherit;transition:all .15s;}
+  .btn-header:hover{color:var(--text);border-color:var(--accent);}
+  .btn-header.connected{color:var(--green);border-color:rgba(34,197,94,.3);}
+  .sync-indicator{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);}
+  .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--text-dim);}
+  .sync-dot.syncing{background:var(--yellow);animation:pulse 1s infinite;}
+  .sync-dot.synced{background:var(--green);}
+  .sync-dot.error{background:var(--orange);}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
-  }
+  .tabs-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;}
+  .tabs-bar::-webkit-scrollbar{display:none;}
+  .tab-btn{padding:12px 16px;font-size:13px;font-weight:500;color:var(--text-muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit;}
+  .tab-btn:hover{color:var(--text);}
+  .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
 
-  /* ── HEADER ── */
-  .header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .logo-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 10px var(--accent);
-  }
-  .header-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 15px; font-weight: 600; letter-spacing: 0.02em;
-  }
-  .header-subtitle { font-size: 12px; color: var(--text-muted); margin-left: 4px; }
-  .header-right { display: flex; align-items: center; gap: 10px; }
+  .main{padding:24px;max-width:1600px;margin:0 auto;}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
 
-  .btn-header {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--surface2);
-    border: 1px solid var(--border-bright);
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 12px; color: var(--text-muted);
-    text-decoration: none; cursor: pointer;
-    font-family: inherit;
-    transition: all 0.15s;
-  }
-  .btn-header:hover { color: var(--text); border-color: var(--accent); }
-  .btn-header.connected { color: var(--green); border-color: rgba(34,197,94,0.3); }
+  .auth-banner{background:var(--surface);border:1px solid var(--border-bright);border-radius:10px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .auth-banner.hidden{display:none;}
+  .auth-banner-text h3{font-size:14px;font-weight:600;margin-bottom:4px;}
+  .auth-banner-text p{font-size:12px;color:var(--text-muted);}
+  .btn-signin{background:var(--accent);color:#fff;border:none;border-radius:7px;padding:9px 18px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap;transition:opacity .15s;}
+  .btn-signin:hover{opacity:.88;}
 
-  .sync-indicator {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 11px; color: var(--text-dim);
-  }
-  .sync-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--text-dim);
-  }
-  .sync-dot.syncing { background: var(--yellow); animation: pulse 1s infinite; }
-  .sync-dot.synced { background: var(--green); }
-  .sync-dot.error { background: var(--orange); }
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+  .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;}
+  .kpi-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+  .kpi-value{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;line-height:1;margin-bottom:4px;}
+  .kpi-sub{font-size:11px;color:var(--text-muted);}
+  .kpi-bar{height:3px;border-radius:2px;background:var(--border);margin-top:10px;overflow:hidden;}
+  .kpi-bar-fill{height:100%;border-radius:2px;transition:width .6s ease;}
 
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .search-wrap{position:relative;flex:1;min-width:200px;max-width:340px;}
+  .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-dim);pointer-events:none;}
+  .search-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:8px 12px 8px 34px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;}
+  .search-input::placeholder{color:var(--text-dim);}
+  .search-input:focus{border-color:var(--accent);}
+  .filter-select{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:8px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s;}
+  .filter-select:focus{border-color:var(--accent);}
+  .filter-select option{background:var(--surface2);}
+  .btn-refresh{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border-bright);border-radius:7px;padding:8px 12px;font-size:12px;color:var(--text-muted);font-family:inherit;cursor:pointer;transition:all .15s;}
+  .btn-refresh:hover{color:var(--text);border-color:var(--accent);}
+  .btn-refresh.spinning svg{animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* ── TABS ── */
-  .tabs-bar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    display: flex; gap: 4px;
-    overflow-x: auto; scrollbar-width: none;
-  }
-  .tabs-bar::-webkit-scrollbar { display: none; }
-  .tab-btn {
-    padding: 12px 16px;
-    font-size: 13px; font-weight: 500;
-    color: var(--text-muted);
-    background: none; border: none;
-    border-bottom: 2px solid transparent;
-    cursor: pointer; white-space: nowrap;
-    transition: all 0.15s; font-family: inherit;
-  }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .table-scroll{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th{background:var(--surface2);color:var(--text-dim);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+  td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:rgba(255,255,255,.02);}
+  .td-num{color:var(--text-dim);font-size:12px;width:40px;}
+  .td-bold{font-weight:500;}
 
-  /* ── LAYOUT ── */
-  .main { padding: 24px; max-width: 1600px; margin: 0 auto; }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
+  .status-badge{display:inline-flex;align-items:center;gap:5px;border-radius:5px;padding:3px 8px;font-size:11px;font-weight:600;white-space:nowrap;}
+  .status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .s-produzir{background:var(--surface2);color:var(--text-dim);}
+  .s-produzir .status-dot{background:var(--text-dim);}
+  .s-andamento{background:var(--yellow-bg);color:var(--yellow);border:1px solid rgba(245,158,11,.2);}
+  .s-andamento .status-dot{background:var(--yellow);}
+  .s-revisao{background:var(--orange-bg);color:var(--orange);border:1px solid rgba(249,115,22,.2);}
+  .s-revisao .status-dot{background:var(--orange);}
+  .s-aprovado{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
+  .s-aprovado .status-dot{background:var(--blue);}
+  .s-entregue{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+  .s-entregue .status-dot{background:var(--green);}
+  .status-select-inline{background:transparent;border:none;color:inherit;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;outline:none;max-width:130px;}
 
-  /* ── AUTH BANNER ── */
-  .auth-banner {
-    background: var(--surface);
-    border: 1px solid var(--border-bright);
-    border-radius: 10px;
-    padding: 20px 24px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-  }
-  .auth-banner.hidden { display: none; }
-  .auth-banner-text h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-  .auth-banner-text p { font-size: 12px; color: var(--text-muted); }
-  .btn-signin {
-    background: var(--accent);
-    color: #fff; border: none;
-    border-radius: 7px; padding: 9px 18px;
-    font-size: 13px; font-weight: 500;
-    font-family: inherit; cursor: pointer;
-    white-space: nowrap; transition: opacity 0.15s;
-  }
-  .btn-signin:hover { opacity: 0.88; }
+  .link-cell a{color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:4px;font-size:12px;}
+  .link-cell a:hover{text-decoration:underline;}
+  .tag-naming{background:var(--purple-bg);color:var(--purple);border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
 
-  /* ── KPI CARDS ── */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px; margin-bottom: 24px;
-  }
-  .kpi-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 16px;
-  }
-  .kpi-label {
-    font-size: 11px; color: var(--text-dim);
-    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
-  }
-  .kpi-value {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px;
-  }
-  .kpi-sub { font-size: 11px; color: var(--text-muted); }
-  .kpi-bar {
-    height: 3px; border-radius: 2px;
-    background: var(--border); margin-top: 10px; overflow: hidden;
-  }
-  .kpi-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+  .empty-state{padding:60px 24px;text-align:center;color:var(--text-dim);}
+  .empty-state h3{font-size:15px;color:var(--text-muted);margin-bottom:6px;}
+  .empty-state p{font-size:13px;}
 
-  /* ── TOOLBAR ── */
-  .toolbar {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 16px; flex-wrap: wrap;
-  }
-  .search-wrap {
-    position: relative; flex: 1;
-    min-width: 200px; max-width: 340px;
-  }
-  .search-wrap svg {
-    position: absolute; left: 10px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-dim); pointer-events: none;
-  }
-  .search-input {
-    width: 100%; background: var(--surface);
-    border: 1px solid var(--border); border-radius: 7px;
-    padding: 8px 12px 8px 34px;
-    color: var(--text); font-size: 13px; font-family: inherit;
-    outline: none; transition: border-color 0.15s;
-  }
-  .search-input::placeholder { color: var(--text-dim); }
-  .search-input:focus { border-color: var(--accent); }
-  .filter-select {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 7px; padding: 8px 12px;
-    color: var(--text); font-size: 13px; font-family: inherit;
-    outline: none; cursor: pointer; transition: border-color 0.15s;
-  }
-  .filter-select:focus { border-color: var(--accent); }
-  .filter-select option { background: var(--surface2); }
+  .overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .card-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;}
+  .card-body{padding:16px;}
+  .legend-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;}
+  .legend-label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);}
+  .legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .legend-count{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;}
+  .legend-bar-wrap{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;max-width:120px;}
+  .legend-bar-fill{height:100%;border-radius:2px;}
 
-  .btn-refresh {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--surface2); border: 1px solid var(--border-bright);
-    border-radius: 7px; padding: 8px 12px;
-    font-size: 12px; color: var(--text-muted);
-    font-family: inherit; cursor: pointer; transition: all 0.15s;
-  }
-  .btn-refresh:hover { color: var(--text); border-color: var(--accent); }
-  .btn-refresh.spinning svg { animation: spin 0.8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .pat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+  .pat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;}
+  .pat-name{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+  .pat-detail{font-size:12px;color:var(--text-muted);margin-bottom:4px;display:flex;gap:6px;}
+  .pat-detail-label{color:var(--text-dim);min-width:80px;}
+  .pat-confirmado{background:var(--green-bg);color:var(--green);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:600;}
+  .pat-pendente{background:var(--yellow-bg);color:var(--yellow);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:600;}
 
-  /* ── TABLE ── */
-  .table-wrap {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; overflow: hidden;
-  }
-  .table-scroll { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; }
-  th {
-    background: var(--surface2); color: var(--text-dim);
-    font-size: 11px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.07em;
-    padding: 10px 14px; text-align: left;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  td {
-    padding: 10px 14px; border-bottom: 1px solid var(--border);
-    vertical-align: middle; font-size: 13px;
-    max-width: 200px; overflow: hidden;
-    text-overflow: ellipsis; white-space: nowrap;
-  }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(255,255,255,0.02); }
-  .td-num { color: var(--text-dim); font-size: 12px; width: 40px; }
-  .td-bold { font-weight: 500; }
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border-bright);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--text);z-index:300;transform:translateY(80px);opacity:0;transition:all .25s ease;max-width:340px;}
+  .toast.show{transform:translateY(0);opacity:1;}
 
-  /* ── STATUS BADGE ── */
-  .status-badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    border-radius: 5px; padding: 3px 8px;
-    font-size: 11px; font-weight: 600; white-space: nowrap;
-  }
-  .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .skel{display:inline-block;height:12px;border-radius:4px;background:var(--border-bright);animation:shimmer 1.2s ease infinite alternate;}
+  @keyframes shimmer{from{opacity:.5}to{opacity:1}}
+  .skeleton-row td{opacity:.4;}
 
-  .s-produzir { background: var(--surface2); color: var(--text-dim); }
-  .s-produzir .status-dot { background: var(--text-dim); }
-  .s-andamento { background: var(--yellow-bg); color: var(--yellow); border: 1px solid rgba(245,158,11,0.2); }
-  .s-andamento .status-dot { background: var(--yellow); }
-  .s-revisao { background: var(--orange-bg); color: var(--orange); border: 1px solid rgba(249,115,22,0.2); }
-  .s-revisao .status-dot { background: var(--orange); }
-  .s-aprovado { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(59,130,246,0.2); }
-  .s-aprovado .status-dot { background: var(--blue); }
-  .s-entregue { background: var(--green-bg); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
-  .s-entregue .status-dot { background: var(--green); }
-
-  .status-select-inline {
-    background: transparent; border: none; color: inherit;
-    font-size: 11px; font-weight: 600; font-family: inherit;
-    cursor: pointer; outline: none; max-width: 130px;
-  }
-
-  /* ── LINK CELL ── */
-  .link-cell a {
-    color: var(--accent); text-decoration: none;
-    display: inline-flex; align-items: center; gap: 4px; font-size: 12px;
-  }
-  .link-cell a:hover { text-decoration: underline; }
-
-  /* ── TAGS ── */
-  .tag-naming {
-    background: var(--purple-bg); color: var(--purple);
-    border-radius: 4px; padding: 2px 6px;
-    font-size: 10px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.05em;
-  }
-  .tag-sheets {
-    background: var(--blue-bg); color: var(--blue);
-    border-radius: 4px; padding: 2px 6px;
-    font-size: 10px; font-weight: 600;
-  }
-
-  /* ── ACTION BTNS ── */
-  .action-btn {
-    background: none; border: none; color: var(--text-dim);
-    cursor: pointer; font-size: 12px; padding: 3px 6px;
-    border-radius: 4px; font-family: inherit; transition: all 0.12s;
-  }
-  .action-btn:hover { color: var(--text); background: var(--surface2); }
-  .action-btn.danger:hover { color: var(--orange); }
-
-  /* ── EMPTY STATE ── */
-  .empty-state {
-    padding: 60px 24px; text-align: center; color: var(--text-dim);
-  }
-  .empty-state h3 { font-size: 15px; color: var(--text-muted); margin-bottom: 6px; }
-  .empty-state p { font-size: 13px; }
-
-  /* ── OVERVIEW ── */
-  .overview-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 16px; margin-top: 16px;
-  }
-  .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; overflow: hidden;
-  }
-  .card-header {
-    padding: 14px 16px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13px; font-weight: 600;
-  }
-  .card-body { padding: 16px; }
-  .legend-row {
-    display: flex; align-items: center;
-    justify-content: space-between; gap: 12px; margin-bottom: 10px;
-  }
-  .legend-label {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13px; color: var(--text-muted);
-  }
-  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .legend-count {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 16px; font-weight: 600;
-  }
-  .legend-bar-wrap {
-    flex: 1; height: 4px; background: var(--border);
-    border-radius: 2px; overflow: hidden; max-width: 120px;
-  }
-  .legend-bar-fill { height: 100%; border-radius: 2px; }
-
-  /* ── PATROCINADORES ── */
-  .pat-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
-  }
-  .pat-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 16px;
-  }
-  .pat-name {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 15px; font-weight: 600; margin-bottom: 8px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .pat-detail {
-    font-size: 12px; color: var(--text-muted);
-    margin-bottom: 4px; display: flex; gap: 6px;
-  }
-  .pat-detail-label { color: var(--text-dim); min-width: 80px; }
-  .pat-confirmado { background: var(--green-bg); color: var(--green); border-radius: 5px; padding: 2px 7px; font-size: 10px; font-weight: 600; }
-  .pat-pendente { background: var(--yellow-bg); color: var(--yellow); border-radius: 5px; padding: 2px 7px; font-size: 10px; font-weight: 600; }
-
-  /* ── TOAST ── */
-  .toast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: var(--surface2); border: 1px solid var(--border-bright);
-    border-radius: 8px; padding: 12px 16px;
-    font-size: 13px; color: var(--text);
-    z-index: 300; transform: translateY(80px); opacity: 0;
-    transition: all 0.25s ease; max-width: 340px;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-
-  /* ── LOADING SKELETON ── */
-  .skeleton-row td { opacity: 0.4; }
-  .skel {
-    display: inline-block; height: 12px; border-radius: 4px;
-    background: var(--border-bright);
-    animation: shimmer 1.2s ease infinite alternate;
-  }
-  @keyframes shimmer { from{opacity:0.5} to{opacity:1} }
-
-  @media (max-width: 768px) {
-    .main { padding: 16px; }
-    .overview-grid { grid-template-columns: 1fr; }
-    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-  }
+  @media(max-width:768px){.main{padding:16px;}.overview-grid{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <div class="logo-dot"></div>
@@ -402,28 +150,22 @@
       <div class="sync-dot" id="sync-dot"></div>
       <span id="sync-label">Não conectado</span>
     </div>
-    <a href="https://docs.google.com/spreadsheets/d/1xUhqk-KDPGzUl8EC5HbxcjXI8h1m1yhTF5Pqt4iiZTA/edit" target="_blank" class="btn-header">
-      Abrir Planilha
-    </a>
-    <button class="btn-header" id="btn-auth" onclick="handleAuthClick()">
-      Conectar ao Google
-    </button>
+    <a href="https://docs.google.com/spreadsheets/d/1xUhqk-KDPGzUl8EC5HbxcjXI8h1m1yhTF5Pqt4iiZTA/edit" target="_blank" class="btn-header">Abrir Planilha</a>
+    <button class="btn-header" id="btn-auth" onclick="handleAuthClick()">Conectar ao Google</button>
   </div>
 </header>
 
-<!-- TABS -->
 <nav class="tabs-bar">
   <button class="tab-btn active" data-tab="visao-geral">Visão Geral</button>
   <button class="tab-btn" data-tab="palcos">Palcos</button>
   <button class="tab-btn" data-tab="leds">LEDs Gerais</button>
   <button class="tab-btn" data-tab="totens">Totens Digitais</button>
+  <button class="tab-btn" data-tab="barralogos">Barra de Logos</button>
   <button class="tab-btn" data-tab="patrocinadores">Patrocinadores</button>
 </nav>
 
-<!-- MAIN -->
 <main class="main">
 
-  <!-- AUTH BANNER -->
   <div class="auth-banner" id="auth-banner">
     <div class="auth-banner-text">
       <h3>Conecte ao Google Sheets para carregar os dados da planilha</h3>
@@ -452,7 +194,7 @@
     <div class="toolbar">
       <div class="search-wrap">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input class="search-input" type="text" placeholder="Buscar palco, conferência, patrocinador..." id="search-palcos">
+        <input class="search-input" type="text" placeholder="Buscar palco, patrocinador..." id="search-palcos">
       </div>
       <select class="filter-select" id="filter-status-palcos">
         <option value="">Todos os status</option>
@@ -462,40 +204,22 @@
         <option value="APROVADO">Aprovado</option>
         <option value="ENTREGUE">Entregue</option>
       </select>
-      <select class="filter-select" id="filter-local-palcos">
-        <option value="">Todos os locais</option>
-      </select>
+      <select class="filter-select" id="filter-local-palcos"><option value="">Todos os locais</option></select>
       <button class="btn-refresh" id="btn-refresh-palcos" onclick="syncSheets()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         Sincronizar
       </button>
     </div>
-    <div class="table-wrap">
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Nº</th>
-              <th>Local</th>
-              <th>Nº Palco</th>
-              <th>Palco / LED</th>
-              <th>Dimensões</th>
-              <th>M²</th>
-              <th>Pixel</th>
-              <th>Tipo de Conteúdo</th>
-              <th>Naming Right</th>
-              <th>Patrocinadores (logos)</th>
-              <th>Link Logos</th>
-              <th>Patrocinadores (vídeo)</th>
-              <th>Link Conteúdo</th>
-              <th>Fornecedor</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-palcos"></tbody>
-        </table>
-      </div>
-    </div>
+    <div class="table-wrap"><div class="table-scroll">
+      <table>
+        <thead><tr>
+          <th>Nº</th><th>Local</th><th>Nº Palco</th><th>Palco / LED</th>
+          <th>Dimensões</th><th>M²</th><th>Pixel</th><th>Tipo de Conteúdo</th>
+          <th>Naming Right</th><th>Link Fundo de Palco</th><th>Fornecedor</th><th>Status</th>
+        </tr></thead>
+        <tbody id="tbody-palcos"></tbody>
+      </table>
+    </div></div>
   </div>
 
   <!-- LEDs -->
@@ -518,31 +242,16 @@
         Sincronizar
       </button>
     </div>
-    <div class="table-wrap">
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Nº</th>
-              <th>Local</th>
-              <th>Palco / LED</th>
-              <th>Dimensões</th>
-              <th>M²</th>
-              <th>Pixel</th>
-              <th>Tipo de Conteúdo</th>
-              <th>Naming Right</th>
-              <th>Patrocinadores (logos)</th>
-              <th>Link Logos</th>
-              <th>Patrocinadores (vídeo)</th>
-              <th>Link Conteúdo</th>
-              <th>Fornecedor</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-leds"></tbody>
-        </table>
-      </div>
-    </div>
+    <div class="table-wrap"><div class="table-scroll">
+      <table>
+        <thead><tr>
+          <th>Nº</th><th>Local</th><th>Palco / LED</th>
+          <th>Dimensões</th><th>M²</th><th>Pixel</th><th>Tipo de Conteúdo</th>
+          <th>Naming Right</th><th>Patrocinadores (marcas)</th><th>Link Conteúdo</th><th>Fornecedor</th><th>Status</th>
+        </tr></thead>
+        <tbody id="tbody-leds"></tbody>
+      </table>
+    </div></div>
   </div>
 
   <!-- TOTENS -->
@@ -565,29 +274,47 @@
         Sincronizar
       </button>
     </div>
-    <div class="table-wrap">
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Nº</th>
-              <th>Local</th>
-              <th>Nome do Totem</th>
-              <th>Dimensões</th>
-              <th>Pixel</th>
-              <th>Tipo de Conteúdo</th>
-              <th>Naming Right</th>
-              <th>Patrocinadores (logos)</th>
-              <th>Patrocinadores (vídeo)</th>
-              <th>Link Conteúdo</th>
-              <th>Fornecedor</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-totens"></tbody>
-        </table>
+    <div class="table-wrap"><div class="table-scroll">
+      <table>
+        <thead><tr>
+          <th>Nº</th><th>Local</th><th>Nome do Totem</th><th>Dimensões</th><th>Pixel</th>
+          <th>Tipo de Conteúdo</th><th>Naming Right</th><th>Patrocinadores (marcas)</th>
+          <th>Link Conteúdo</th><th>Fornecedor</th><th>Status</th>
+        </tr></thead>
+        <tbody id="tbody-totens"></tbody>
+      </table>
+    </div></div>
+  </div>
+
+  <!-- BARRA DE LOGOS -->
+  <div class="tab-panel" id="tab-barralogos">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" type="text" placeholder="Buscar barra de logos..." id="search-barralogos">
       </div>
+      <select class="filter-select" id="filter-status-barralogos">
+        <option value="">Todos os status</option>
+        <option value="A PRODUZIR">A Produzir</option>
+        <option value="EM ANDAMENTO">Em Andamento</option>
+        <option value="EM REVISÃO">Em Revisão</option>
+        <option value="APROVADO">Aprovado</option>
+        <option value="ENTREGUE">Entregue</option>
+      </select>
+      <button class="btn-refresh" onclick="syncSheets()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Sincronizar
+      </button>
     </div>
+    <div class="table-wrap"><div class="table-scroll">
+      <table>
+        <thead><tr>
+          <th>Palcos</th><th>Dimensões</th><th>Pixel</th><th>Tipo</th>
+          <th>Patrocinadores (logos)</th><th>Link Barras de Logos</th><th>Status</th>
+        </tr></thead>
+        <tbody id="tbody-barralogos"></tbody>
+      </table>
+    </div></div>
   </div>
 
   <!-- PATROCINADORES -->
@@ -608,278 +335,153 @@
 
 </main>
 
-<!-- TOAST -->
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  CONFIG
-// ═══════════════════════════════════════════════════════════════
 const CLIENT_ID   = '500984639548-oir86h5scfj2n0gifbbsoi0341tkkrqf.apps.googleusercontent.com';
 const SHEET_ID    = '1xUhqk-KDPGzUl8EC5HbxcjXI8h1m1yhTF5Pqt4iiZTA';
 const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets.readonly';
 const STATUS_LIST = ['A PRODUZIR','EM ANDAMENTO','EM REVISÃO','APROVADO','ENTREGUE'];
 
-// Sheet tab names (must match exactly)
-const SHEET_PALCOS  = 'Palcos';
-const SHEET_LEDS    = 'LEDs Gerais';
-const SHEET_TOTENS  = 'Totens Digitais';
+const SHEET_PALCOS     = 'Palcos';
+const SHEET_LEDS       = 'LEDs Gerais';
+const SHEET_TOTENS     = 'Totens Digitais';
+const SHEET_BARRALOGOS = 'Barra de logos';
 
-// ═══════════════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════════════
 let accessToken = null;
 let isSignedIn  = false;
+let ROWS = { palcos:[], leds:[], totens:[], barralogos:[] };
 
-// Raw rows from Sheets (arrays of values, header stripped)
-let ROWS = { palcos: [], leds: [], totens: [] };
-
-// Status store: { "palcos:rowKey": "EM ANDAMENTO", ... }
-// rowKey = first non-empty cell of the row (Nº or Palco name)
-function loadStatuses() {
-  try { return JSON.parse(localStorage.getItem('riw_statuses') || '{}'); } catch(e) { return {}; }
-}
-function saveStatuses(obj) {
-  localStorage.setItem('riw_statuses', JSON.stringify(obj));
-}
+function loadStatuses(){ try{ return JSON.parse(localStorage.getItem('riw_statuses')||'{}'); }catch(e){ return {}; } }
+function saveStatuses(obj){ localStorage.setItem('riw_statuses', JSON.stringify(obj)); }
 let STATUSES = loadStatuses();
 
-function statusKey(section, row) {
-  // use column index 0 (Nº) + 3 (Palco/LED name) as composite key
+function statusKey(section, row){
   const a = (row[0]||'').toString().trim();
   const b = (row[3]||row[2]||'').toString().trim();
-  return section + ':' + (a || b || JSON.stringify(row).slice(0,40));
+  return section + ':' + (a||b||JSON.stringify(row).slice(0,40));
 }
+function getStatus(section, row){ return STATUSES[statusKey(section,row)] || 'A PRODUZIR'; }
+function setStatusByKey(key, value){ STATUSES[key]=value; saveStatuses(STATUSES); renderAll(); showToast('Status atualizado.'); }
 
-function getStatus(section, row) {
-  return STATUSES[statusKey(section, row)] || 'A PRODUZIR';
-}
-
-function setStatus(section, row, value) {
-  STATUSES[statusKey(section, row)] = value;
-  saveStatuses(STATUSES);
-  renderAll();
-  showToast('Status atualizado.');
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  GOOGLE AUTH (GIS + fetch)
-// ═══════════════════════════════════════════════════════════════
 let tokenClient;
-
-function initGoogleAuth() {
-  if (!window.google) { setTimeout(initGoogleAuth, 300); return; }
+function initGoogleAuth(){
+  if(!window.google){ setTimeout(initGoogleAuth,300); return; }
   tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: SCOPES,
-    callback: (resp) => {
-      if (resp.error) { setSyncState('error', 'Erro de autenticação'); return; }
-      accessToken = resp.access_token;
-      isSignedIn  = true;
+    client_id: CLIENT_ID, scope: SCOPES,
+    callback:(resp)=>{
+      if(resp.error){ setSyncState('error','Erro de autenticação'); return; }
+      accessToken=resp.access_token; isSignedIn=true;
       document.getElementById('auth-banner').classList.add('hidden');
-      document.getElementById('btn-auth').textContent = 'Desconectar';
+      document.getElementById('btn-auth').textContent='Desconectar';
       document.getElementById('btn-auth').classList.add('connected');
       syncSheets();
     },
   });
 }
-
-function handleAuthClick() {
-  if (isSignedIn) {
-    google.accounts.oauth2.revoke(accessToken, () => {
-      accessToken = null; isSignedIn = false;
-      document.getElementById('btn-auth').textContent = 'Conectar ao Google';
+function handleAuthClick(){
+  if(isSignedIn){
+    google.accounts.oauth2.revoke(accessToken,()=>{
+      accessToken=null; isSignedIn=false;
+      document.getElementById('btn-auth').textContent='Conectar ao Google';
       document.getElementById('btn-auth').classList.remove('connected');
       document.getElementById('auth-banner').classList.remove('hidden');
-      setSyncState('idle', 'Não conectado');
+      setSyncState('idle','Não conectado');
     });
-  } else {
-    tokenClient.requestAccessToken({ prompt: 'consent' });
-  }
+  } else { tokenClient.requestAccessToken({prompt:'consent'}); }
 }
+window.addEventListener('load',()=>{ setTimeout(initGoogleAuth,500); });
 
-window.addEventListener('load', () => { setTimeout(initGoogleAuth, 500); });
-
-// ═══════════════════════════════════════════════════════════════
-//  SYNC FROM SHEETS
-// ═══════════════════════════════════════════════════════════════
-async function syncSheets() {
-  if (!accessToken) { showToast('Conecte ao Google primeiro.'); return; }
-  setSyncState('syncing', 'Sincronizando...');
+async function syncSheets(){
+  if(!accessToken){ showToast('Conecte ao Google primeiro.'); return; }
+  setSyncState('syncing','Sincronizando...');
   setBtnRefreshSpinning(true);
-
-  try {
-    const [palcos, leds, totens] = await Promise.all([
-      fetchSheet(SHEET_PALCOS),
-      fetchSheet(SHEET_LEDS),
-      fetchSheet(SHEET_TOTENS),
+  try{
+    const [palcos,leds,totens,barralogos] = await Promise.all([
+      fetchSheet(SHEET_PALCOS), fetchSheet(SHEET_LEDS),
+      fetchSheet(SHEET_TOTENS), fetchSheet(SHEET_BARRALOGOS),
     ]);
-
-    ROWS.palcos = palcos;
-    ROWS.leds   = leds;
-    ROWS.totens = totens;
-
-    const now = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
-    setSyncState('synced', 'Sincronizado às ' + now);
+    ROWS.palcos=palcos; ROWS.leds=leds; ROWS.totens=totens; ROWS.barralogos=barralogos;
+    const now = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    setSyncState('synced','Sincronizado às '+now);
     renderAll();
     showToast('Dados atualizados da planilha.');
-  } catch(e) {
+  } catch(e){
     console.error(e);
-    setSyncState('error', 'Erro ao sincronizar');
+    setSyncState('error','Erro ao sincronizar');
     showToast('Erro ao buscar dados. Verifique o acesso.');
-  } finally {
-    setBtnRefreshSpinning(false);
-  }
+  } finally { setBtnRefreshSpinning(false); }
 }
 
-async function fetchSheet(tabName) {
-  const range = encodeURIComponent(tabName + '!A1:Z200');
+async function fetchSheet(tabName){
+  const range = encodeURIComponent(tabName+'!A1:Z500');
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}`;
-  const res = await fetch(url, {
-    headers: { Authorization: 'Bearer ' + accessToken }
-  });
-  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const res = await fetch(url,{ headers:{ Authorization:'Bearer '+accessToken } });
+  if(!res.ok) throw new Error('HTTP '+res.status);
   const data = await res.json();
   const rows = data.values || [];
-  // Planilha tem 3 linhas de cabeçalho antes dos dados:
-  // Linha 1: título, Linha 2: seção, Linha 3: cabeçalho colunas
-  // Dados começam na linha 4 (índice 3)
+  // 3 linhas de cabeçalho, dados a partir da linha 4 (índice 3)
   return rows.slice(3).filter(r => r.some(c => (c||'').toString().trim() !== ''));
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  SYNC STATE UI
-// ═══════════════════════════════════════════════════════════════
-function setSyncState(state, label) {
-  const dot = document.getElementById('sync-dot');
-  const lbl = document.getElementById('sync-label');
-  dot.className = 'sync-dot ' + (state === 'syncing' ? 'syncing' : state === 'synced' ? 'synced' : state === 'error' ? 'error' : '');
-  lbl.textContent = label;
+function setSyncState(state,label){
+  const dot=document.getElementById('sync-dot');
+  const lbl=document.getElementById('sync-label');
+  dot.className='sync-dot '+(state==='syncing'?'syncing':state==='synced'?'synced':state==='error'?'error':'');
+  lbl.textContent=label;
 }
+function setBtnRefreshSpinning(on){ document.querySelectorAll('.btn-refresh').forEach(b=>b.classList.toggle('spinning',on)); }
 
-function setBtnRefreshSpinning(on) {
-  document.querySelectorAll('.btn-refresh').forEach(b => {
-    b.classList.toggle('spinning', on);
-  });
+function esc(str){ return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function col(row,i){ return esc((row[i]||'').toString().trim()); }
+function colRaw(row,i){ return (row[i]||'').toString().trim(); }
+
+function statusClass(s){
+  const map={'A PRODUZIR':'produzir','EM ANDAMENTO':'andamento','EM REVISÃO':'revisao','APROVADO':'aprovado','ENTREGUE':'entregue'};
+  return map[s]||'produzir';
 }
-
-// ═══════════════════════════════════════════════════════════════
-//  HELPERS
-// ═══════════════════════════════════════════════════════════════
-function esc(str) {
-  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function statusBadge(section,row){
+  const current=getStatus(section,row);
+  const cls=statusClass(current);
+  const key=statusKey(section,row);
+  const opts=STATUS_LIST.map(s=>`<option value="${s}"${s===current?' selected':''}>${s}</option>`).join('');
+  return `<span class="status-badge s-${cls}"><span class="status-dot"></span><select class="status-select-inline" onchange="setStatusByKey('${esc(key)}',this.value)">${opts}</select></span>`;
 }
-
-function col(row, i) { return esc((row[i]||'').toString().trim()); }
-function colRaw(row, i) { return (row[i]||'').toString().trim(); }
-
-function statusClass(s) {
-  const map = {'A PRODUZIR':'produzir','EM ANDAMENTO':'andamento','EM REVISÃO':'revisao','APROVADO':'aprovado','ENTREGUE':'entregue'};
-  return map[s] || 'produzir';
+function linkCell(url){
+  if(!url) return '';
+  return `<a href="${esc(url)}" target="_blank"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Abrir</a>`;
 }
+function showToast(msg){ const t=document.getElementById('toast'); document.getElementById('toast-msg').textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+function skeletonRows(cols,n=5){ return Array(n).fill(0).map(()=>`<tr class="skeleton-row">${Array(cols).fill(0).map(()=>`<td><span class="skel" style="width:${40+Math.random()*60}px"></span></td>`).join('')}</tr>`).join(''); }
 
-function statusBadge(section, row) {
-  const current = getStatus(section, row);
-  const cls = statusClass(current);
-  const key = esc(statusKey(section, row));
-  const opts = STATUS_LIST.map(s =>
-    `<option value="${s}"${s===current?' selected':''}>${s}</option>`
-  ).join('');
-  return `<span class="status-badge s-${cls}">
-    <span class="status-dot"></span>
-    <select class="status-select-inline"
-      onchange="setStatusByKey('${esc(statusKey(section,row))}',this.value)">${opts}</select>
-  </span>`;
-}
+// ── RENDER PALCOS ──
+// Colunas (base 0): Nº(0)|LOCAL(1)|Nº PALCO(2)|PALCO/LED(3)|DIMENSÕES(4)|M²(5)|PIXEL(6)|TIPO(7)|NAMING RIGHT(8)|LINK FUNDO(9)|FORNECEDOR(10)
+function renderPalcos(){
+  const q   = (document.getElementById('search-palcos')?.value||'').toLowerCase();
+  const st  = document.getElementById('filter-status-palcos')?.value||'';
+  const loc = document.getElementById('filter-local-palcos')?.value||'';
 
-function setStatusByKey(key, value) {
-  STATUSES[key] = value;
-  saveStatuses(STATUSES);
-  renderAll();
-  showToast('Status atualizado.');
-}
-
-function linkCell(url) {
-  if (!url) return '';
-  return `<a href="${esc(url)}" target="_blank">
-    <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-    Abrir
-  </a>`;
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-function skeletonRows(cols, n=5) {
-  return Array(n).fill(0).map(() =>
-    `<tr class="skeleton-row">${Array(cols).fill(0).map((_,i) =>
-      `<td><span class="skel" style="width:${40+Math.random()*60}px"></span></td>`
-    ).join('')}</tr>`
-  ).join('');
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  RENDER — PALCOS
-//  Columns: Nº | LOCAL | Nº DO PALCO | PALCO/LED | DIMENSÕES | M² | PIXEL
-//           | TIPO | PATS(logos) | LINK LOGOS | PATS(video) | NAMING | FORNECEDOR
-//           | LINK CONTEÚDO | STATUS
-// ═══════════════════════════════════════════════════════════════
-function renderPalcos() {
-  const q   = (document.getElementById('search-palcos')?.value || '').toLowerCase();
-  const st  = document.getElementById('filter-status-palcos')?.value || '';
-  const loc = document.getElementById('filter-local-palcos')?.value || '';
-
-  let rows = ROWS.palcos;
-
-  if (!rows.length && !isSignedIn) {
-    document.getElementById('tbody-palcos').innerHTML =
-      `<tr><td colspan="15"><div class="empty-state">
-        <h3>Aguardando conexão</h3>
-        <p>Conecte ao Google para carregar os dados da planilha.</p>
-      </div></td></tr>`;
+  if(!ROWS.palcos.length && !isSignedIn){
+    document.getElementById('tbody-palcos').innerHTML=`<tr><td colspan="12"><div class="empty-state"><h3>Aguardando conexão</h3><p>Conecte ao Google para carregar os dados.</p></div></td></tr>`;
     return;
   }
+  if(!ROWS.palcos.length && isSignedIn){ document.getElementById('tbody-palcos').innerHTML=skeletonRows(12); return; }
 
-  if (!rows.length && isSignedIn) {
-    document.getElementById('tbody-palcos').innerHTML = skeletonRows(15);
-    return;
-  }
-
-  // filters
-  if (q) rows = rows.filter(r =>
-    r.some(c => (c||'').toString().toLowerCase().includes(q))
-  );
-  if (st) rows = rows.filter(r => getStatus('palcos', r) === st);
-  if (loc) rows = rows.filter(r => colRaw(r,1) === loc);
+  let rows = ROWS.palcos.filter(r=>(r[3]||'').toString().trim()!=='');
 
   // update local filter
-  const locSel = document.getElementById('filter-local-palcos');
-  const locs = [...new Set(ROWS.palcos.map(r=>colRaw(r,1)).filter(Boolean))];
-  const curLoc = locSel.value;
-  locSel.innerHTML = '<option value="">Todos os locais</option>' +
-    locs.map(l=>`<option value="${esc(l)}"${l===curLoc?' selected':''}>${esc(l)}</option>`).join('');
+  const locSel=document.getElementById('filter-local-palcos');
+  const locs=[...new Set(ROWS.palcos.map(r=>colRaw(r,1)).filter(Boolean))];
+  const curLoc=locSel.value;
+  locSel.innerHTML='<option value="">Todos os locais</option>'+locs.map(l=>`<option value="${esc(l)}"${l===curLoc?' selected':''}>${esc(l)}</option>`).join('');
 
-  if (!rows.length) {
-    document.getElementById('tbody-palcos').innerHTML =
-      `<tr><td colspan="15"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
-    return;
-  }
+  if(q) rows=rows.filter(r=>r.some(c=>(c||'').toString().toLowerCase().includes(q)));
+  if(st) rows=rows.filter(r=>getStatus('palcos',r)===st);
+  if(loc) rows=rows.filter(r=>colRaw(r,1)===loc);
 
-  // Colunas (base 0): Nº(0) | LOCAL(1) | Nº PALCO(2) | PALCO/LED(3) | DIMENSÕES(4) | M²(5) | PIXEL(6) | TIPO(7) | NAMING RIGHT(8) | PATS logos(9) | LINK LOGOS(10) | PATS video(11) | LINK CONTEÚDO(12) | FORNECEDOR(13)
-  // Filtra apenas linhas com PALCO/LED preenchido (índice 3)
-  rows = rows.filter(r => (r[3]||'').toString().trim() !== '');
+  if(!rows.length){ document.getElementById('tbody-palcos').innerHTML=`<tr><td colspan="12"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`; return; }
 
-  if (!rows.length) {
-    document.getElementById('tbody-palcos').innerHTML =
-      `<tr><td colspan="15"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
-    return;
-  }
-
-  document.getElementById('tbody-palcos').innerHTML = rows.map(r => `
+  document.getElementById('tbody-palcos').innerHTML=rows.map(r=>`
     <tr>
       <td class="td-num">${col(r,0)}</td>
       <td>${col(r,1)}</td>
@@ -890,86 +492,28 @@ function renderPalcos() {
       <td>${col(r,6)}</td>
       <td>${col(r,7)}</td>
       <td>${colRaw(r,8)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
-      <td>${col(r,9)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,10))}</td>
-      <td>${col(r,11)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,12))}</td>
-      <td>${col(r,13)}</td>
-      <td>${statusBadge('palcos', r)}</td>
-    </tr>
-  `).join('');
-
-  if (!rows.length) {
-    document.getElementById('tbody-palcos').innerHTML =
-      `<tr><td colspan="15"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
-    return;
-  }
-
-  document.getElementById('tbody-palcos').innerHTML = rows.map(r => `
-    <tr>
-      <td class="td-num">${col(r,0)}</td>
-      <td>${col(r,1)}</td>
-      <td>${col(r,2)}</td>
-      <td class="td-bold">${col(r,3)}</td>
-      <td>${col(r,4)}</td>
-      <td>${col(r,5)}</td>
-      <td>${col(r,6)}</td>
-      <td>${col(r,7)}</td>
-      <td>${colRaw(r,8)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
-      <td>${col(r,9)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,10))}</td>
-      <td>${col(r,11)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,12))}</td>
-      <td>${col(r,13)}</td>
-      <td>${statusBadge('palcos', r)}</td>
-    </tr>
-  `).join('');
+      <td class="link-cell">${linkCell(colRaw(r,9))}</td>
+      <td>${col(r,10)}</td>
+      <td>${statusBadge('palcos',r)}</td>
+    </tr>`).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  RENDER — LEDs GERAIS
-//  Columns: Nº | LOCAL | PALCO/LED | DIMENSÕES | M² | PIXEL
-//           | TIPO | PATS(logos) | LINK LOGOS | PATS(video) | NAMING | FORNECEDOR
-//           | LINK CONTEÚDO | STATUS
-// ═══════════════════════════════════════════════════════════════
-function renderLeds() {
-  const q  = (document.getElementById('search-leds')?.value || '').toLowerCase();
-  const st = document.getElementById('filter-status-leds')?.value || '';
-  let rows = ROWS.leds;
+// ── RENDER LEDs ──
+// Colunas (base 0): Nº(0)|LOCAL(1)|PALCO/LED(2)|DIMENSÕES(3)|M²(4)|PIXEL(5)|TIPO(6)|NAMING RIGHT(7)|PATS marcas(8)|LINK CONTEÚDO(9)|FORNECEDOR(10)
+function renderLeds(){
+  const q  = (document.getElementById('search-leds')?.value||'').toLowerCase();
+  const st = document.getElementById('filter-status-leds')?.value||'';
 
-  if (!rows.length && !isSignedIn) {
-    document.getElementById('tbody-leds').innerHTML =
-      `<tr><td colspan="14"><div class="empty-state">
-        <h3>Aguardando conexão</h3>
-        <p>Conecte ao Google para carregar os dados da planilha.</p>
-      </div></td></tr>`;
-    return;
-  }
-  if (!rows.length && isSignedIn) {
-    document.getElementById('tbody-leds').innerHTML = skeletonRows(14);
-    return;
-  }
+  if(!ROWS.leds.length && !isSignedIn){ document.getElementById('tbody-leds').innerHTML=`<tr><td colspan="12"><div class="empty-state"><h3>Aguardando conexão</h3></div></td></tr>`; return; }
+  if(!ROWS.leds.length && isSignedIn){ document.getElementById('tbody-leds').innerHTML=skeletonRows(12); return; }
 
-  if (q) rows = rows.filter(r => r.some(c => (c||'').toString().toLowerCase().includes(q)));
-  if (st) rows = rows.filter(r => getStatus('leds', r) === st);
+  let rows = ROWS.leds.filter(r=>(r[2]||'').toString().trim()!=='');
+  if(q) rows=rows.filter(r=>r.some(c=>(c||'').toString().toLowerCase().includes(q)));
+  if(st) rows=rows.filter(r=>getStatus('leds',r)===st);
 
-  if (!rows.length) {
-    document.getElementById('tbody-leds').innerHTML =
-      `<tr><td colspan="14"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
-    return;
-  }
+  if(!rows.length){ document.getElementById('tbody-leds').innerHTML=`<tr><td colspan="12"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`; return; }
 
-  // Colunas (base 0): Nº(0) | LOCAL(1) | PALCO/LED(2) | DIMENSÕES(3) | M²(4) | PIXEL(5) | TIPO(6) | NAMING RIGHT(7) | PATS logos(8) | LINK LOGOS(9) | PATS video(10) | LINK CONTEÚDO(11) | FORNECEDOR(12)
-  // Filtra apenas linhas com PALCO/LED preenchido (índice 2)
-  rows = rows.filter(r => (r[2]||'').toString().trim() !== '');
-
-  if (!rows.length) {
-    document.getElementById('tbody-leds').innerHTML =
-      `<tr><td colspan="14"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
-    return;
-  }
-
-  document.getElementById('tbody-leds').innerHTML = rows.map(r => `
+  document.getElementById('tbody-leds').innerHTML=rows.map(r=>`
     <tr>
       <td class="td-num">${col(r,0)}</td>
       <td>${col(r,1)}</td>
@@ -982,82 +526,26 @@ function renderLeds() {
       <td>${col(r,8)}</td>
       <td class="link-cell">${linkCell(colRaw(r,9))}</td>
       <td>${col(r,10)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,11))}</td>
-      <td>${col(r,12)}</td>
-      <td>${statusBadge('leds', r)}</td>
-    </tr>
-  `).join('');
-
-  if (!rows.length) {
-    document.getElementById('tbody-leds').innerHTML =
-      `<tr><td colspan="14"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
-    return;
-  }
-
-  document.getElementById('tbody-leds').innerHTML = rows.map(r => `
-    <tr>
-      <td class="td-num">${col(r,0)}</td>
-      <td>${col(r,1)}</td>
-      <td class="td-bold">${col(r,2)}</td>
-      <td>${col(r,3)}</td>
-      <td>${col(r,4)}</td>
-      <td>${col(r,5)}</td>
-      <td>${col(r,6)}</td>
-      <td>${colRaw(r,7)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
-      <td>${col(r,8)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,9))}</td>
-      <td>${col(r,10)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,11))}</td>
-      <td>${col(r,12)}</td>
-      <td>${statusBadge('leds', r)}</td>
-    </tr>
-  `).join('');
+      <td>${statusBadge('leds',r)}</td>
+    </tr>`).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  RENDER — TOTENS
-//  Columns: Nº | ESPAÇO | LOCAL | NOME | DIMENSÕES | PIXEL
-//           | TIPO | PATS(logos) | PATS(video) | NAMING | FORNECEDOR
-//           | RESPONSÁVEL | LINK | STATUS | OBS
-// ═══════════════════════════════════════════════════════════════
-function renderTotens() {
-  const q  = (document.getElementById('search-totens')?.value || '').toLowerCase();
-  const st = document.getElementById('filter-status-totens')?.value || '';
-  let rows = ROWS.totens;
+// ── RENDER TOTENS ──
+// Colunas (base 0): Nº(0)|LOCAL(1)|NOME TOTEM(2)|DIMENSÕES(3)|PIXEL(4)|TIPO(5)|NAMING RIGHT(6)|PATS marcas(7)|LINK CONTEÚDO(8)|FORNECEDOR(9)
+function renderTotens(){
+  const q  = (document.getElementById('search-totens')?.value||'').toLowerCase();
+  const st = document.getElementById('filter-status-totens')?.value||'';
 
-  if (!rows.length && !isSignedIn) {
-    document.getElementById('tbody-totens').innerHTML =
-      `<tr><td colspan="15"><div class="empty-state">
-        <h3>Aguardando conexão</h3>
-        <p>Conecte ao Google para carregar os dados da planilha.</p>
-      </div></td></tr>`;
-    return;
-  }
-  if (!rows.length && isSignedIn) {
-    document.getElementById('tbody-totens').innerHTML = skeletonRows(15);
-    return;
-  }
+  if(!ROWS.totens.length && !isSignedIn){ document.getElementById('tbody-totens').innerHTML=`<tr><td colspan="11"><div class="empty-state"><h3>Aguardando conexão</h3></div></td></tr>`; return; }
+  if(!ROWS.totens.length && isSignedIn){ document.getElementById('tbody-totens').innerHTML=skeletonRows(11); return; }
 
-  if (q) rows = rows.filter(r => r.some(c => (c||'').toString().toLowerCase().includes(q)));
-  if (st) rows = rows.filter(r => getStatus('totens', r) === st);
+  let rows = ROWS.totens.filter(r=>(r[2]||'').toString().trim()!=='');
+  if(q) rows=rows.filter(r=>r.some(c=>(c||'').toString().toLowerCase().includes(q)));
+  if(st) rows=rows.filter(r=>getStatus('totens',r)===st);
 
-  if (!rows.length) {
-    document.getElementById('tbody-totens').innerHTML =
-      `<tr><td colspan="15"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
-    return;
-  }
+  if(!rows.length){ document.getElementById('tbody-totens').innerHTML=`<tr><td colspan="11"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`; return; }
 
-  // Colunas (base 0): Nº(0) | LOCAL(1) | NOME TOTEM(2) | DIMENSÕES(3) | PIXEL(4) | TIPO(5) | NAMING RIGHT(6) | PATS logos(7) | PATS video(8) | LINK CONTEÚDO(9) | FORNECEDOR(10)
-  // Filtra apenas linhas com NOME DO TOTEM preenchido (índice 2)
-  rows = rows.filter(r => (r[2]||'').toString().trim() !== '');
-
-  if (!rows.length) {
-    document.getElementById('tbody-totens').innerHTML =
-      `<tr><td colspan="12"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
-    return;
-  }
-
-  document.getElementById('tbody-totens').innerHTML = rows.map(r => `
+  document.getElementById('tbody-totens').innerHTML=rows.map(r=>`
     <tr>
       <td class="td-num">${col(r,0)}</td>
       <td>${col(r,1)}</td>
@@ -1067,237 +555,145 @@ function renderTotens() {
       <td>${col(r,5)}</td>
       <td>${colRaw(r,6)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
       <td>${col(r,7)}</td>
-      <td>${col(r,8)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,9))}</td>
-      <td>${col(r,10)}</td>
-      <td>${statusBadge('totens', r)}</td>
-    </tr>
-  `).join('');
-
-  if (!rows.length) {
-    document.getElementById('tbody-totens').innerHTML =
-      `<tr><td colspan="12"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
-    return;
-  }
-
-  document.getElementById('tbody-totens').innerHTML = rows.map(r => `
-    <tr>
-      <td class="td-num">${col(r,0)}</td>
-      <td>${col(r,1)}</td>
-      <td class="td-bold">${col(r,2)}</td>
-      <td>${col(r,3)}</td>
-      <td>${col(r,4)}</td>
-      <td>${col(r,5)}</td>
-      <td>${colRaw(r,6)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
-      <td>${col(r,7)}</td>
-      <td>${col(r,8)}</td>
-      <td class="link-cell">${linkCell(colRaw(r,9))}</td>
-      <td>${col(r,10)}</td>
-      <td>${statusBadge('totens', r)}</td>
-    </tr>
-  `).join('');
+      <td class="link-cell">${linkCell(colRaw(r,8))}</td>
+      <td>${col(r,9)}</td>
+      <td>${statusBadge('totens',r)}</td>
+    </tr>`).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  RENDER — PATROCINADORES (static from planilha data)
-// ═══════════════════════════════════════════════════════════════
-const PATROCINADORES = [
-  {pat:'GWM', conf:'Mobilidade Urbana + Smart Cities (Palco 13)', status:'Confirmado', obs:'', tipo:'Naming Right'},
-  {pat:'Rede Américas', conf:'Global Health (Palco 16)', status:'Confirmado', obs:'', tipo:'Naming Right'},
-  {pat:'RecargaPay', conf:'IA in Action / Tech Trends / Futuro do Trabalho (Palco 27)', status:'Confirmado', obs:'', tipo:'Naming Right'},
-  {pat:'Banco do Brasil', conf:'Open Innovation A e B (Palcos 21 e 21A)', status:'Confirmado', obs:'', tipo:'Naming Right'},
-  {pat:'BNDES', conf:'Palco a definir', status:'Pendente', obs:'Assina sem palco definido', tipo:'Naming Right'},
-  {pat:'Águas do Rio', conf:'Palco a definir', status:'Pendente', obs:'Assina sem palco definido', tipo:'Naming Right'},
-  {pat:'Claro', conf:'Palco a definir', status:'Pendente', obs:'Assina sem palco definido', tipo:'Naming Right'},
-  {pat:'SESC', conf:'Vórtex', status:'Pendente', obs:'Assina sem palco definido', tipo:'Naming Right'},
-  {pat:'FGV', conf:'I Fórum Econômico RIW FGV / RIW Talks (dias 5 e 6)', status:'Confirmado', obs:'Palcos Kobra a decidir', tipo:'Naming Right'},
-  {pat:'Pref. Niterói', conf:'Palco a definir', status:'Pendente', obs:'Assina sem palco definido', tipo:'Naming Right'},
-  {pat:'BAT Brasil', conf:'Open Innovation (Palco 21 / 21A)', status:'Confirmado', obs:'', tipo:'Destaque em Palco'},
-  {pat:'SENAC', conf:'Plenária (Palco 31)', status:'Confirmado', obs:'"SENAC APRESENTA"', tipo:'Destaque em Palco'},
-  {pat:'GWM', conf:'Logo Exclusiva em Totens', status:'Confirmado', obs:'2 totens', tipo:'Logo Totens'},
-  {pat:'Stellantis', conf:'Logo Exclusiva em Totens', status:'Confirmado', obs:'2 totens', tipo:'Logo Totens'},
-  {pat:'Banco do Brasil', conf:'Logo Exclusiva em Totens', status:'Confirmado', obs:'6 totens', tipo:'Logo Totens'},
-  {pat:'BNDES', conf:'Logo Exclusiva em Totens', status:'Confirmado', obs:'3 totens', tipo:'Logo Totens'},
-  {pat:'Águas do Rio', conf:'Logo Exclusiva em Totens', status:'Confirmado', obs:'2 totens', tipo:'Logo Totens'},
-  {pat:'Claro', conf:'Logo Exclusiva em Totens', status:'Confirmado', obs:'2 totens', tipo:'Logo Totens'},
+// ── RENDER BARRA DE LOGOS ──
+// Colunas (base 0): PALCOS(0)|DIMENSÕES(1)|PIXEL(2)|TIPO(3)|PATS logos(4)|LINK LOGOS(5)
+function renderBarraLogos(){
+  const q  = (document.getElementById('search-barralogos')?.value||'').toLowerCase();
+  const st = document.getElementById('filter-status-barralogos')?.value||'';
+
+  if(!ROWS.barralogos.length && !isSignedIn){ document.getElementById('tbody-barralogos').innerHTML=`<tr><td colspan="7"><div class="empty-state"><h3>Aguardando conexão</h3></div></td></tr>`; return; }
+  if(!ROWS.barralogos.length && isSignedIn){ document.getElementById('tbody-barralogos').innerHTML=skeletonRows(7); return; }
+
+  let rows = ROWS.barralogos.filter(r=>(r[0]||'').toString().trim()!=='');
+  if(q) rows=rows.filter(r=>r.some(c=>(c||'').toString().toLowerCase().includes(q)));
+  if(st) rows=rows.filter(r=>getStatus('barralogos',r)===st);
+
+  if(!rows.length){ document.getElementById('tbody-barralogos').innerHTML=`<tr><td colspan="7"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`; return; }
+
+  document.getElementById('tbody-barralogos').innerHTML=rows.map(r=>`
+    <tr>
+      <td class="td-bold">${col(r,0)}</td>
+      <td>${col(r,1)}</td>
+      <td>${col(r,2)}</td>
+      <td>${col(r,3)}</td>
+      <td>${col(r,4)}</td>
+      <td class="link-cell">${linkCell(colRaw(r,5))}</td>
+      <td>${statusBadge('barralogos',r)}</td>
+    </tr>`).join('');
+}
+
+// ── RENDER PATROCINADORES (estático) ──
+const PATROCINADORES=[
+  {pat:'GWM',conf:'Mobilidade Urbana + Smart Cities (Palco 13)',status:'Confirmado',obs:'',tipo:'Naming Right'},
+  {pat:'Rede Américas',conf:'Global Health (Palco 16)',status:'Confirmado',obs:'',tipo:'Naming Right'},
+  {pat:'RecargaPay',conf:'IA in Action / Tech Trends / Futuro do Trabalho (Palco 27)',status:'Confirmado',obs:'',tipo:'Naming Right'},
+  {pat:'Banco do Brasil',conf:'Open Innovation A e B (Palcos 21 e 21A)',status:'Confirmado',obs:'',tipo:'Naming Right'},
+  {pat:'BNDES',conf:'Palco a definir',status:'Pendente',obs:'Assina sem palco definido',tipo:'Naming Right'},
+  {pat:'Águas do Rio',conf:'Palco a definir',status:'Pendente',obs:'Assina sem palco definido',tipo:'Naming Right'},
+  {pat:'Claro',conf:'Palco a definir',status:'Pendente',obs:'Assina sem palco definido',tipo:'Naming Right'},
+  {pat:'SESC',conf:'Vórtex',status:'Pendente',obs:'Assina sem palco definido',tipo:'Naming Right'},
+  {pat:'FGV',conf:'I Fórum Econômico RIW FGV / RIW Talks (dias 5 e 6)',status:'Confirmado',obs:'Palcos Kobra a decidir',tipo:'Naming Right'},
+  {pat:'Pref. Niterói',conf:'Palco a definir',status:'Pendente',obs:'Assina sem palco definido',tipo:'Naming Right'},
+  {pat:'BAT Brasil',conf:'Open Innovation (Palco 21 / 21A)',status:'Confirmado',obs:'',tipo:'Destaque em Palco'},
+  {pat:'SENAC',conf:'Plenária (Palco 31)',status:'Confirmado',obs:'"SENAC APRESENTA"',tipo:'Destaque em Palco'},
+  {pat:'GWM',conf:'Logo Exclusiva em Totens',status:'Confirmado',obs:'2 totens',tipo:'Logo Totens'},
+  {pat:'Stellantis',conf:'Logo Exclusiva em Totens',status:'Confirmado',obs:'2 totens',tipo:'Logo Totens'},
+  {pat:'Banco do Brasil',conf:'Logo Exclusiva em Totens',status:'Confirmado',obs:'6 totens',tipo:'Logo Totens'},
+  {pat:'BNDES',conf:'Logo Exclusiva em Totens',status:'Confirmado',obs:'3 totens',tipo:'Logo Totens'},
+  {pat:'Águas do Rio',conf:'Logo Exclusiva em Totens',status:'Confirmado',obs:'2 totens',tipo:'Logo Totens'},
+  {pat:'Claro',conf:'Logo Exclusiva em Totens',status:'Confirmado',obs:'2 totens',tipo:'Logo Totens'},
 ];
-
-function renderPatrocinadores() {
-  const q  = (document.getElementById('search-pat')?.value || '').toLowerCase();
-  const st = document.getElementById('filter-pat-status')?.value || '';
-  let rows = PATROCINADORES;
-  if (q) rows = rows.filter(r => r.pat.toLowerCase().includes(q) || r.conf.toLowerCase().includes(q));
-  if (st) rows = rows.filter(r => r.status === st);
-
-  const grid = document.getElementById('pat-grid');
-  if (!rows.length) {
-    grid.innerHTML = `<div class="empty-state"><h3>Nenhum patrocinador encontrado</h3></div>`;
-    return;
-  }
-  grid.innerHTML = rows.map(r => `
+function renderPatrocinadores(){
+  const q  = (document.getElementById('search-pat')?.value||'').toLowerCase();
+  const st = document.getElementById('filter-pat-status')?.value||'';
+  let rows=PATROCINADORES;
+  if(q) rows=rows.filter(r=>r.pat.toLowerCase().includes(q)||r.conf.toLowerCase().includes(q));
+  if(st) rows=rows.filter(r=>r.status===st);
+  const grid=document.getElementById('pat-grid');
+  if(!rows.length){ grid.innerHTML=`<div class="empty-state"><h3>Nenhum patrocinador encontrado</h3></div>`; return; }
+  grid.innerHTML=rows.map(r=>`
     <div class="pat-card">
-      <div class="pat-name">
-        ${esc(r.pat)}
-        <span class="${r.status==='Confirmado'?'pat-confirmado':'pat-pendente'}">${r.status}</span>
-      </div>
+      <div class="pat-name">${esc(r.pat)}<span class="${r.status==='Confirmado'?'pat-confirmado':'pat-pendente'}">${r.status}</span></div>
       <div class="pat-detail"><span class="pat-detail-label">Tipo</span>${esc(r.tipo)}</div>
       <div class="pat-detail"><span class="pat-detail-label">Palco / Conf.</span>${esc(r.conf)}</div>
       ${r.obs?`<div class="pat-detail"><span class="pat-detail-label">Obs.</span>${esc(r.obs)}</div>`:''}
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  RENDER — VISÃO GERAL
-// ═══════════════════════════════════════════════════════════════
-function renderVisaoGeral() {
-  const allRows = [
-    ...ROWS.palcos.map(r=>({r,s:'palcos'})),
-    ...ROWS.leds.map(r=>({r,s:'leds'})),
-    ...ROWS.totens.map(r=>({r,s:'totens'})),
+// ── RENDER VISÃO GERAL ──
+function renderVisaoGeral(){
+  const allRows=[
+    ...ROWS.palcos.filter(r=>(r[3]||'').toString().trim()!=='').map(r=>({r,s:'palcos'})),
+    ...ROWS.leds.filter(r=>(r[2]||'').toString().trim()!=='').map(r=>({r,s:'leds'})),
+    ...ROWS.totens.filter(r=>(r[2]||'').toString().trim()!=='').map(r=>({r,s:'totens'})),
+    ...ROWS.barralogos.filter(r=>(r[0]||'').toString().trim()!=='').map(r=>({r,s:'barralogos'})),
   ];
-  const total = allRows.length;
-  const count = (st) => allRows.filter(({r,s}) => getStatus(s,r) === st).length;
+  const total=allRows.length;
+  const count=st=>allRows.filter(({r,s})=>getStatus(s,r)===st).length;
+  const aProd=count('A PRODUZIR'), emAnd=count('EM ANDAMENTO'), emRev=count('EM REVISÃO'), aprov=count('APROVADO'), entreg=count('ENTREGUE');
+  const done=aprov+entreg;
+  const pct=n=>total>0?Math.round(n/total*100):0;
 
-  const aProd  = count('A PRODUZIR');
-  const emAnd  = count('EM ANDAMENTO');
-  const emRev  = count('EM REVISÃO');
-  const aprov  = count('APROVADO');
-  const entreg = count('ENTREGUE');
-  const done   = aprov + entreg;
-  const pct    = (n) => total > 0 ? Math.round(n/total*100) : 0;
+  document.getElementById('kpi-grid').innerHTML=`
+    <div class="kpi-card"><div class="kpi-label">Total de Itens</div><div class="kpi-value" style="color:var(--accent)">${total}</div>
+      <div class="kpi-sub">${ROWS.palcos.filter(r=>(r[3]||'').trim()!=='').length} palcos · ${ROWS.leds.filter(r=>(r[2]||'').trim()!=='').length} LEDs · ${ROWS.totens.filter(r=>(r[2]||'').trim()!=='').length} totens · ${ROWS.barralogos.filter(r=>(r[0]||'').trim()!=='').length} barras</div></div>
+    <div class="kpi-card"><div class="kpi-label">A Produzir</div><div class="kpi-value" style="color:var(--text-dim)">${aProd}</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(aProd)}%;background:var(--text-dim)"></div></div></div>
+    <div class="kpi-card"><div class="kpi-label">Em Andamento</div><div class="kpi-value" style="color:var(--yellow)">${emAnd}</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(emAnd)}%;background:var(--yellow)"></div></div></div>
+    <div class="kpi-card"><div class="kpi-label">Em Revisão</div><div class="kpi-value" style="color:var(--orange)">${emRev}</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(emRev)}%;background:var(--orange)"></div></div></div>
+    <div class="kpi-card"><div class="kpi-label">Aprovado</div><div class="kpi-value" style="color:var(--blue)">${aprov}</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(aprov)}%;background:var(--blue)"></div></div></div>
+    <div class="kpi-card"><div class="kpi-label">Entregue</div><div class="kpi-value" style="color:var(--green)">${entreg}</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(entreg)}%;background:var(--green)"></div></div></div>`;
 
-  document.getElementById('kpi-grid').innerHTML = `
-    <div class="kpi-card">
-      <div class="kpi-label">Total de Itens</div>
-      <div class="kpi-value" style="color:var(--accent)">${total}</div>
-      <div class="kpi-sub">${ROWS.palcos.length} palcos · ${ROWS.leds.length} LEDs · ${ROWS.totens.length} totens</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">A Produzir</div>
-      <div class="kpi-value" style="color:var(--text-dim)">${aProd}</div>
-      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(aProd)}%;background:var(--text-dim)"></div></div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Em Andamento</div>
-      <div class="kpi-value" style="color:var(--yellow)">${emAnd}</div>
-      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(emAnd)}%;background:var(--yellow)"></div></div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Em Revisão</div>
-      <div class="kpi-value" style="color:var(--orange)">${emRev}</div>
-      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(emRev)}%;background:var(--orange)"></div></div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Aprovado</div>
-      <div class="kpi-value" style="color:var(--blue)">${aprov}</div>
-      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(aprov)}%;background:var(--blue)"></div></div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Entregue</div>
-      <div class="kpi-value" style="color:var(--green)">${entreg}</div>
-      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(entreg)}%;background:var(--green)"></div></div>
-    </div>
-  `;
+  document.getElementById('status-legend').innerHTML=[
+    {label:'A Produzir',color:'var(--text-dim)',n:aProd},
+    {label:'Em Andamento',color:'var(--yellow)',n:emAnd},
+    {label:'Em Revisão',color:'var(--orange)',n:emRev},
+    {label:'Aprovado',color:'var(--blue)',n:aprov},
+    {label:'Entregue',color:'var(--green)',n:entreg},
+  ].map(l=>`<div class="legend-row"><div class="legend-label"><div class="legend-dot" style="background:${l.color}"></div>${l.label}</div><div class="legend-bar-wrap"><div class="legend-bar-fill" style="width:${pct(l.n)}%;background:${l.color}"></div></div><div class="legend-count" style="color:${l.color}">${l.n}</div></div>`).join('');
 
-  document.getElementById('status-legend').innerHTML = [
-    {label:'A Produzir', color:'var(--text-dim)', n:aProd},
-    {label:'Em Andamento', color:'var(--yellow)', n:emAnd},
-    {label:'Em Revisão', color:'var(--orange)', n:emRev},
-    {label:'Aprovado', color:'var(--blue)', n:aprov},
-    {label:'Entregue', color:'var(--green)', n:entreg},
-  ].map(l => `
-    <div class="legend-row">
-      <div class="legend-label">
-        <div class="legend-dot" style="background:${l.color}"></div>${l.label}
-      </div>
-      <div class="legend-bar-wrap">
-        <div class="legend-bar-fill" style="width:${pct(l.n)}%;background:${l.color}"></div>
-      </div>
-      <div class="legend-count" style="color:${l.color}">${l.n}</div>
-    </div>
-  `).join('');
-
-  document.getElementById('progress-by-section').innerHTML = [
-    {key:'palcos', label:'Palcos'},
-    {key:'leds',   label:'LEDs Gerais'},
-    {key:'totens', label:'Totens Digitais'},
-  ].map(s => {
-    const t = ROWS[s.key].length;
-    const d = ROWS[s.key].filter(r => {
-      const st = getStatus(s.key, r);
-      return st === 'APROVADO' || st === 'ENTREGUE';
-    }).length;
-    const p = t > 0 ? Math.round(d/t*100) : 0;
-    const c = p>=75?'var(--green)':p>=40?'var(--yellow)':'var(--text-dim)';
-    return `
-      <div style="margin-bottom:20px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <span style="font-size:13px;color:var(--text-muted)">${s.label}</span>
-          <span style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:${c}">${d}/${t}</span>
-        </div>
-        <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
-          <div style="height:100%;width:${p}%;background:${c};border-radius:3px;transition:width 0.6s ease;"></div>
-        </div>
-      </div>`;
-  }).join('') + `
-    <div style="padding-top:12px;border-top:1px solid var(--border);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <span style="font-size:13px;font-weight:600">Total Geral</span>
-        <span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:${done>0?'var(--green)':'var(--text-dim)'};">${pct(done)}%</span>
-      </div>
-      <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
-        <div style="height:100%;width:${pct(done)}%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:4px;transition:width 0.6s ease;"></div>
-      </div>
-    </div>`;
+  const sections=[
+    {key:'palcos',label:'Palcos',filter:r=>(r[3]||'').trim()!==''},
+    {key:'leds',label:'LEDs Gerais',filter:r=>(r[2]||'').trim()!==''},
+    {key:'totens',label:'Totens Digitais',filter:r=>(r[2]||'').trim()!==''},
+    {key:'barralogos',label:'Barra de Logos',filter:r=>(r[0]||'').trim()!==''},
+  ];
+  document.getElementById('progress-by-section').innerHTML=sections.map(s=>{
+    const t=ROWS[s.key].filter(s.filter).length;
+    const d=ROWS[s.key].filter(s.filter).filter(r=>{ const st=getStatus(s.key,r); return st==='APROVADO'||st==='ENTREGUE'; }).length;
+    const p=t>0?Math.round(d/t*100):0;
+    const c=p>=75?'var(--green)':p>=40?'var(--yellow)':'var(--text-dim)';
+    return `<div style="margin-bottom:20px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:13px;color:var(--text-muted)">${s.label}</span><span style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:${c}">${d}/${t}</span></div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${p}%;background:${c};border-radius:3px;transition:width .6s ease;"></div></div></div>`;
+  }).join('')+`<div style="padding-top:12px;border-top:1px solid var(--border);"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:13px;font-weight:600">Total Geral</span><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:${done>0?'var(--green)':'var(--text-dim)'};">${pct(done)}%</span></div><div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${pct(done)}%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:4px;transition:width .6s ease;"></div></div></div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  RENDER ALL
-// ═══════════════════════════════════════════════════════════════
-function renderAll() {
-  renderVisaoGeral();
-  renderPalcos();
-  renderLeds();
-  renderTotens();
-  renderPatrocinadores();
+function renderAll(){
+  renderVisaoGeral(); renderPalcos(); renderLeds();
+  renderTotens(); renderBarraLogos(); renderPatrocinadores();
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  TABS
-// ═══════════════════════════════════════════════════════════════
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+// ── TABS ──
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
   });
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  FILTER LISTENERS
-// ═══════════════════════════════════════════════════════════════
-['search-palcos','filter-status-palcos','filter-local-palcos'].forEach(id => {
-  document.getElementById(id)?.addEventListener('input', renderPalcos);
-  document.getElementById(id)?.addEventListener('change', renderPalcos);
-});
-['search-leds','filter-status-leds'].forEach(id => {
-  document.getElementById(id)?.addEventListener('input', renderLeds);
-  document.getElementById(id)?.addEventListener('change', renderLeds);
-});
-['search-totens','filter-status-totens'].forEach(id => {
-  document.getElementById(id)?.addEventListener('input', renderTotens);
-  document.getElementById(id)?.addEventListener('change', renderTotens);
-});
-['search-pat','filter-pat-status'].forEach(id => {
-  document.getElementById(id)?.addEventListener('input', renderPatrocinadores);
-  document.getElementById(id)?.addEventListener('change', renderPatrocinadores);
-});
+// ── FILTROS ──
+['search-palcos','filter-status-palcos','filter-local-palcos'].forEach(id=>{ document.getElementById(id)?.addEventListener('input',renderPalcos); document.getElementById(id)?.addEventListener('change',renderPalcos); });
+['search-leds','filter-status-leds'].forEach(id=>{ document.getElementById(id)?.addEventListener('input',renderLeds); document.getElementById(id)?.addEventListener('change',renderLeds); });
+['search-totens','filter-status-totens'].forEach(id=>{ document.getElementById(id)?.addEventListener('input',renderTotens); document.getElementById(id)?.addEventListener('change',renderTotens); });
+['search-barralogos','filter-status-barralogos'].forEach(id=>{ document.getElementById(id)?.addEventListener('input',renderBarraLogos); document.getElementById(id)?.addEventListener('change',renderBarraLogos); });
+['search-pat','filter-pat-status'].forEach(id=>{ document.getElementById(id)?.addEventListener('input',renderPatrocinadores); document.getElementById(id)?.addEventListener('change',renderPatrocinadores); });
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') {} });
-
-// ── INIT ──
 renderAll();
 </script>
 </body>
