@@ -465,9 +465,10 @@ function renderPalcos(){
     document.getElementById('tbody-palcos').innerHTML=`<tr><td colspan="12"><div class="empty-state"><h3>Aguardando conexão</h3><p>Conecte ao Google para carregar os dados.</p></div></td></tr>`;
     return;
   }
-  if(!ROWS.palcos.length && isSignedIn){ document.getElementById('tbody-palcos').innerHTML=skeletonRows(12); return; }
 
   let rows = ROWS.palcos.filter(r=>(r[3]||'').toString().trim()!=='');
+
+  if(!rows.length){ document.getElementById('tbody-palcos').innerHTML=`<tr><td colspan="12"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`; return; }
 
   // update local filter
   const locSel=document.getElementById('filter-local-palcos');
@@ -505,9 +506,10 @@ function renderLeds(){
   const st = document.getElementById('filter-status-leds')?.value||'';
 
   if(!ROWS.leds.length && !isSignedIn){ document.getElementById('tbody-leds').innerHTML=`<tr><td colspan="12"><div class="empty-state"><h3>Aguardando conexão</h3></div></td></tr>`; return; }
-  if(!ROWS.leds.length && isSignedIn){ document.getElementById('tbody-leds').innerHTML=skeletonRows(12); return; }
 
   let rows = ROWS.leds.filter(r=>(r[2]||'').toString().trim()!=='');
+
+  if(!rows.length){ document.getElementById('tbody-leds').innerHTML=`<tr><td colspan="12"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`; return; }
   if(q) rows=rows.filter(r=>r.some(c=>(c||'').toString().toLowerCase().includes(q)));
   if(st) rows=rows.filter(r=>getStatus('leds',r)===st);
 
@@ -537,9 +539,11 @@ function renderTotens(){
   const st = document.getElementById('filter-status-totens')?.value||'';
 
   if(!ROWS.totens.length && !isSignedIn){ document.getElementById('tbody-totens').innerHTML=`<tr><td colspan="11"><div class="empty-state"><h3>Aguardando conexão</h3></div></td></tr>`; return; }
-  if(!ROWS.totens.length && isSignedIn){ document.getElementById('tbody-totens').innerHTML=skeletonRows(11); return; }
 
   let rows = ROWS.totens.filter(r=>(r[2]||'').toString().trim()!=='');
+
+  if(!rows.length){ document.getElementById('tbody-totens').innerHTML=`<tr><td colspan="11"><div class="empty-state"><h3>Nenhum resultado encontrado</h3><p>Nenhum totem cadastrado na planilha ainda.</p></div></td></tr>`; return; }
+
   if(q) rows=rows.filter(r=>r.some(c=>(c||'').toString().toLowerCase().includes(q)));
   if(st) rows=rows.filter(r=>getStatus('totens',r)===st);
 
