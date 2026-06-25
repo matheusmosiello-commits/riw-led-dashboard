@@ -184,12 +184,12 @@
       <div class="card">
         <div class="card-header">Distribuição por status</div>
         <div class="card-body">
-          <div style="display:flex;align-items:center;gap:24px;min-height:200px;">
-            <div style="position:relative;width:180px;height:180px;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:20px;min-height:180px;">
+            <div style="position:relative;width:160px;height:160px;flex-shrink:0;">
               <canvas id="donutChart" role="img" aria-label="Distribuição dos status de produção"></canvas>
               <div id="donut-center" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;"></div>
             </div>
-            <div id="donut-legend" style="flex:1;display:flex;flex-direction:column;gap:12px;"></div>
+            <div id="donut-legend" style="flex:1;"></div>
           </div>
         </div>
       </div>
@@ -723,21 +723,18 @@ function renderVisaoGeral(){
       plugins:{legend:{display:false},tooltip:{callbacks:{label:(c)=>` ${c.parsed} itens (${Math.round(c.parsed/(total||1)*100)}%)`}}}
     }
   });
-  document.getElementById('donut-center').innerHTML=`<div style="font-size:26px;font-weight:700;color:var(--text)">${total}</div><div style="font-size:11px;color:var(--text-dim)">itens</div>`;
+  document.getElementById('donut-center').innerHTML=`<div style="font-size:24px;font-weight:700;color:var(--text)">${total}</div><div style="font-size:11px;color:var(--text-dim)">itens</div>`;
 
   // Donut legend
   const leg=document.getElementById('donut-legend');
   leg.innerHTML='';
+  leg.style.cssText='flex:1;display:grid;grid-template-columns:120px 1fr 24px;align-items:center;gap:10px 10px;';
   STATUS_LIST.forEach(s=>{
     const n=count(s), p=pct(n);
-    const row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:8px;';
-    row.innerHTML=`
-      <div style="width:9px;height:9px;border-radius:50%;background:${STATUS_COLORS[s]};flex-shrink:0;"></div>
-      <div style="font-size:13px;color:var(--text-muted);flex:1;">${STATUS_PT[s]}</div>
-      <div style="width:80px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${p}%;background:${STATUS_COLORS[s]};border-radius:2px;"></div></div>
-      <div style="font-size:14px;font-weight:600;color:${STATUS_COLORS[s]};min-width:28px;text-align:right;">${n}</div>`;
-    leg.appendChild(row);
+    leg.innerHTML+=`
+      <div style="display:flex;align-items:center;gap:8px;"><div style="width:8px;height:8px;border-radius:50%;background:${STATUS_COLORS[s]};flex-shrink:0;"></div><span style="font-size:13px;color:var(--text-muted);">${STATUS_PT[s]}</span></div>
+      <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${p}%;background:${STATUS_COLORS[s]};border-radius:2px;"></div></div>
+      <div style="font-size:14px;font-weight:600;color:${STATUS_COLORS[s]};text-align:right;">${n}</div>`;
   });
 
   // Progresso por seção
