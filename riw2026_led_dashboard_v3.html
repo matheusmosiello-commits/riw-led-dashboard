@@ -869,10 +869,35 @@ function renderPalcos() {
     return;
   }
 
-  // Colunas: Nº(0) | LOCAL(1) | Nº PALCO(2) | PALCO/LED(3) | DIMENSÕES(4) | M²(5) | PIXEL(6) | TIPO(7) | NAMING RIGHT(8) | PATS logos(9) | LINK LOGOS(10) | PATS video(11) | LINK CONTEÚDO(12) | FORNECEDOR(13)
-  // STATUS removido da planilha (índice 14) — controlado pelo app
+  // Colunas (base 0): Nº(0) | LOCAL(1) | Nº PALCO(2) | PALCO/LED(3) | DIMENSÕES(4) | M²(5) | PIXEL(6) | TIPO(7) | NAMING RIGHT(8) | PATS logos(9) | LINK LOGOS(10) | PATS video(11) | LINK CONTEÚDO(12) | FORNECEDOR(13)
   // Filtra apenas linhas com PALCO/LED preenchido (índice 3)
   rows = rows.filter(r => (r[3]||'').toString().trim() !== '');
+
+  if (!rows.length) {
+    document.getElementById('tbody-palcos').innerHTML =
+      `<tr><td colspan="15"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
+    return;
+  }
+
+  document.getElementById('tbody-palcos').innerHTML = rows.map(r => `
+    <tr>
+      <td class="td-num">${col(r,0)}</td>
+      <td>${col(r,1)}</td>
+      <td>${col(r,2)}</td>
+      <td class="td-bold">${col(r,3)}</td>
+      <td>${col(r,4)}</td>
+      <td>${col(r,5)}</td>
+      <td>${col(r,6)}</td>
+      <td>${col(r,7)}</td>
+      <td>${colRaw(r,8)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
+      <td>${col(r,9)}</td>
+      <td class="link-cell">${linkCell(colRaw(r,10))}</td>
+      <td>${col(r,11)}</td>
+      <td class="link-cell">${linkCell(colRaw(r,12))}</td>
+      <td>${col(r,13)}</td>
+      <td>${statusBadge('palcos', r)}</td>
+    </tr>
+  `).join('');
 
   if (!rows.length) {
     document.getElementById('tbody-palcos').innerHTML =
@@ -934,10 +959,34 @@ function renderLeds() {
     return;
   }
 
-  // Colunas: Nº(0) | LOCAL(1) | PALCO/LED(2) | DIMENSÕES(3) | M²(4) | PIXEL(5) | TIPO(6) | NAMING RIGHT(7) | PATS logos(8) | LINK LOGOS(9) | PATS video(10) | LINK CONTEÚDO(11) | FORNECEDOR(12)
-  // STATUS removido da planilha (índice 13) — controlado pelo app
+  // Colunas (base 0): Nº(0) | LOCAL(1) | PALCO/LED(2) | DIMENSÕES(3) | M²(4) | PIXEL(5) | TIPO(6) | NAMING RIGHT(7) | PATS logos(8) | LINK LOGOS(9) | PATS video(10) | LINK CONTEÚDO(11) | FORNECEDOR(12)
   // Filtra apenas linhas com PALCO/LED preenchido (índice 2)
   rows = rows.filter(r => (r[2]||'').toString().trim() !== '');
+
+  if (!rows.length) {
+    document.getElementById('tbody-leds').innerHTML =
+      `<tr><td colspan="14"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
+    return;
+  }
+
+  document.getElementById('tbody-leds').innerHTML = rows.map(r => `
+    <tr>
+      <td class="td-num">${col(r,0)}</td>
+      <td>${col(r,1)}</td>
+      <td class="td-bold">${col(r,2)}</td>
+      <td>${col(r,3)}</td>
+      <td>${col(r,4)}</td>
+      <td>${col(r,5)}</td>
+      <td>${col(r,6)}</td>
+      <td>${colRaw(r,7)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
+      <td>${col(r,8)}</td>
+      <td class="link-cell">${linkCell(colRaw(r,9))}</td>
+      <td>${col(r,10)}</td>
+      <td class="link-cell">${linkCell(colRaw(r,11))}</td>
+      <td>${col(r,12)}</td>
+      <td>${statusBadge('leds', r)}</td>
+    </tr>
+  `).join('');
 
   if (!rows.length) {
     document.getElementById('tbody-leds').innerHTML =
@@ -998,10 +1047,32 @@ function renderTotens() {
     return;
   }
 
-  // Colunas: Nº(0) | LOCAL(1) | NOME TOTEM(2) | DIMENSÕES(3) | PIXEL(4) | TIPO(5) | NAMING RIGHT(6) | PATS logos(7) | PATS video(8) | LINK CONTEÚDO(9) | FORNECEDOR(10)
-  // STATUS removido da planilha (índice 11) — controlado pelo app
+  // Colunas (base 0): Nº(0) | LOCAL(1) | NOME TOTEM(2) | DIMENSÕES(3) | PIXEL(4) | TIPO(5) | NAMING RIGHT(6) | PATS logos(7) | PATS video(8) | LINK CONTEÚDO(9) | FORNECEDOR(10)
   // Filtra apenas linhas com NOME DO TOTEM preenchido (índice 2)
   rows = rows.filter(r => (r[2]||'').toString().trim() !== '');
+
+  if (!rows.length) {
+    document.getElementById('tbody-totens').innerHTML =
+      `<tr><td colspan="12"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
+    return;
+  }
+
+  document.getElementById('tbody-totens').innerHTML = rows.map(r => `
+    <tr>
+      <td class="td-num">${col(r,0)}</td>
+      <td>${col(r,1)}</td>
+      <td class="td-bold">${col(r,2)}</td>
+      <td>${col(r,3)}</td>
+      <td>${col(r,4)}</td>
+      <td>${col(r,5)}</td>
+      <td>${colRaw(r,6)==='SIM'?`<span class="tag-naming">SIM</span>`:''}</td>
+      <td>${col(r,7)}</td>
+      <td>${col(r,8)}</td>
+      <td class="link-cell">${linkCell(colRaw(r,9))}</td>
+      <td>${col(r,10)}</td>
+      <td>${statusBadge('totens', r)}</td>
+    </tr>
+  `).join('');
 
   if (!rows.length) {
     document.getElementById('tbody-totens').innerHTML =
