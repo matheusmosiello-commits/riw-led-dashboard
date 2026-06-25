@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RIW 2026 — Gestão de Conteúdos LED</title>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
   :root {
@@ -96,8 +97,8 @@
   .s-revisao .status-dot{background:var(--orange);}
   .s-aprovado{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
   .s-aprovado .status-dot{background:var(--blue);}
-  .s-entregue{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,.2);}
-  .s-entregue .status-dot{background:var(--green);}
+  .s-concluido{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+  .s-concluido .status-dot{background:var(--green);}
   .status-select-inline{background:transparent;border:none;color:inherit;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;outline:none;max-width:130px;}
 
   .link-cell a{color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:4px;font-size:12px;}
@@ -181,12 +182,28 @@
     <div class="kpi-grid" id="kpi-grid"></div>
     <div class="overview-grid">
       <div class="card">
-        <div class="card-header">Status por Categoria</div>
-        <div class="card-body"><div id="status-legend"></div></div>
+        <div class="card-header">Distribuição por status</div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:20px;">
+            <div style="position:relative;width:130px;height:130px;flex-shrink:0;">
+              <canvas id="donutChart" role="img" aria-label="Distribuição dos status de produção"></canvas>
+              <div id="donut-center" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;"></div>
+            </div>
+            <div id="donut-legend" style="flex:1;display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+        </div>
       </div>
       <div class="card">
-        <div class="card-header">Progresso por Seção</div>
+        <div class="card-header">Progresso por seção</div>
         <div class="card-body" id="progress-by-section"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">Itens que precisam de atenção <span style="font-size:11px;color:var(--text-dim);font-weight:400;margin-left:6px;">Em Andamento e Em Revisão</span></div>
+      <div class="card-body" id="atencao-body">
+        <div class="empty-state" style="padding:24px 0;">
+          <p>Nenhum item em andamento ou revisão no momento.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -203,8 +220,7 @@
         <option value="A PRODUZIR">A Produzir</option>
         <option value="EM ANDAMENTO">Em Andamento</option>
         <option value="EM REVISÃO">Em Revisão</option>
-        <option value="APROVADO">Aprovado</option>
-        <option value="ENTREGUE">Entregue</option>
+        <option value="CONCLUÍDO">Concluído</option>
       </select>
       <select class="filter-select" id="filter-local-palcos"><option value="">Todos os locais</option></select>
       <button class="btn-refresh" id="btn-refresh-palcos" onclick="syncSheets()">
@@ -236,8 +252,7 @@
         <option value="A PRODUZIR">A Produzir</option>
         <option value="EM ANDAMENTO">Em Andamento</option>
         <option value="EM REVISÃO">Em Revisão</option>
-        <option value="APROVADO">Aprovado</option>
-        <option value="ENTREGUE">Entregue</option>
+        <option value="CONCLUÍDO">Concluído</option>
       </select>
       <button class="btn-refresh" onclick="syncSheets()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
@@ -268,8 +283,7 @@
         <option value="A PRODUZIR">A Produzir</option>
         <option value="EM ANDAMENTO">Em Andamento</option>
         <option value="EM REVISÃO">Em Revisão</option>
-        <option value="APROVADO">Aprovado</option>
-        <option value="ENTREGUE">Entregue</option>
+        <option value="CONCLUÍDO">Concluído</option>
       </select>
       <button class="btn-refresh" onclick="syncSheets()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
@@ -300,8 +314,7 @@
         <option value="A PRODUZIR">A Produzir</option>
         <option value="EM ANDAMENTO">Em Andamento</option>
         <option value="EM REVISÃO">Em Revisão</option>
-        <option value="APROVADO">Aprovado</option>
-        <option value="ENTREGUE">Entregue</option>
+        <option value="CONCLUÍDO">Concluído</option>
       </select>
       <button class="btn-refresh" onclick="syncSheets()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
@@ -343,7 +356,7 @@
 const CLIENT_ID   = '500984639548-oir86h5scfj2n0gifbbsoi0341tkkrqf.apps.googleusercontent.com';
 const SHEET_ID    = '1xUhqk-KDPGzUl8EC5HbxcjXI8h1m1yhTF5Pqt4iiZTA';
 const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets.readonly';
-const STATUS_LIST = ['A PRODUZIR','EM ANDAMENTO','EM REVISÃO','APROVADO','ENTREGUE'];
+const STATUS_LIST = ['A PRODUZIR','EM ANDAMENTO','EM REVISÃO','CONCLUÍDO'];
 
 const SHEET_PALCOS     = 'Palcos';
 const SHEET_LEDS       = 'LEDs Gerais';
@@ -453,7 +466,7 @@ function toggleExpand(td){
 }
 
 function statusClass(s){
-  const map={'A PRODUZIR':'produzir','EM ANDAMENTO':'andamento','EM REVISÃO':'revisao','APROVADO':'aprovado','ENTREGUE':'entregue'};
+  const map={'A PRODUZIR':'produzir','EM ANDAMENTO':'andamento','EM REVISÃO':'revisao','CONCLUÍDO':'concluido'};
   return map[s]||'produzir';
 }
 function statusBadge(section,row){
@@ -647,49 +660,136 @@ function renderPatrocinadores(){
 }
 
 // ── RENDER VISÃO GERAL ──
+const STATUS_COLORS = {'A PRODUZIR':'#4a5068','EM ANDAMENTO':'#f59e0b','EM REVISÃO':'#f97316','CONCLUÍDO':'#22c55e'};
+const STATUS_PT     = {'A PRODUZIR':'A Produzir','EM ANDAMENTO':'Em Andamento','EM REVISÃO':'Em Revisão','CONCLUÍDO':'Concluído'};
+let donutChartInstance = null;
+
+const SECTIONS = [
+  {key:'palcos',    label:'Palcos',         filter:r=>(r[3]||'').toString().trim()!==''},
+  {key:'leds',      label:'LEDs Gerais',    filter:r=>(r[2]||'').toString().trim()!==''},
+  {key:'totens',    label:'Totens Digitais',filter:r=>(r[2]||'').toString().trim()!==''},
+  {key:'barralogos',label:'Barra de Logos', filter:r=>(r[0]||'').toString().trim()!==''},
+];
+
 function renderVisaoGeral(){
   const allRows=[
-    ...ROWS.palcos.filter(r=>(r[3]||'').toString().trim()!=='').map(r=>({r,s:'palcos'})),
-    ...ROWS.leds.filter(r=>(r[2]||'').toString().trim()!=='').map(r=>({r,s:'leds'})),
-    ...ROWS.totens.filter(r=>(r[2]||'').toString().trim()!=='').map(r=>({r,s:'totens'})),
-    ...ROWS.barralogos.filter(r=>(r[0]||'').toString().trim()!=='').map(r=>({r,s:'barralogos'})),
+    ...ROWS.palcos.filter(r=>(r[3]||'').toString().trim()!=='').map(r=>({r,s:'palcos',label:colRaw(r,3)})),
+    ...ROWS.leds.filter(r=>(r[2]||'').toString().trim()!=='').map(r=>({r,s:'leds',label:colRaw(r,2)})),
+    ...ROWS.totens.filter(r=>(r[2]||'').toString().trim()!=='').map(r=>({r,s:'totens',label:colRaw(r,2)})),
+    ...ROWS.barralogos.filter(r=>(r[0]||'').toString().trim()!=='').map(r=>({r,s:'barralogos',label:colRaw(r,0)})),
   ];
   const total=allRows.length;
   const count=st=>allRows.filter(({r,s})=>getStatus(s,r)===st).length;
-  const aProd=count('A PRODUZIR'), emAnd=count('EM ANDAMENTO'), emRev=count('EM REVISÃO'), aprov=count('APROVADO'), entreg=count('ENTREGUE');
-  const done=aprov+entreg;
+  const aProd=count('A PRODUZIR'), emAnd=count('EM ANDAMENTO'), emRev=count('EM REVISÃO'), conc=count('CONCLUÍDO');
+  const emProd=emAnd+emRev;
   const pct=n=>total>0?Math.round(n/total*100):0;
 
+  // KPIs
   document.getElementById('kpi-grid').innerHTML=`
-    <div class="kpi-card"><div class="kpi-label">Total de Itens</div><div class="kpi-value" style="color:var(--accent)">${total}</div>
-      <div class="kpi-sub">${ROWS.palcos.filter(r=>(r[3]||'').trim()!=='').length} palcos · ${ROWS.leds.filter(r=>(r[2]||'').trim()!=='').length} LEDs · ${ROWS.totens.filter(r=>(r[2]||'').trim()!=='').length} totens · ${ROWS.barralogos.filter(r=>(r[0]||'').trim()!=='').length} barras</div></div>
-    <div class="kpi-card"><div class="kpi-label">A Produzir</div><div class="kpi-value" style="color:var(--text-dim)">${aProd}</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(aProd)}%;background:var(--text-dim)"></div></div></div>
-    <div class="kpi-card"><div class="kpi-label">Em Andamento</div><div class="kpi-value" style="color:var(--yellow)">${emAnd}</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(emAnd)}%;background:var(--yellow)"></div></div></div>
-    <div class="kpi-card"><div class="kpi-label">Em Revisão</div><div class="kpi-value" style="color:var(--orange)">${emRev}</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(emRev)}%;background:var(--orange)"></div></div></div>
-    <div class="kpi-card"><div class="kpi-label">Aprovado</div><div class="kpi-value" style="color:var(--blue)">${aprov}</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(aprov)}%;background:var(--blue)"></div></div></div>
-    <div class="kpi-card"><div class="kpi-label">Entregue</div><div class="kpi-value" style="color:var(--green)">${entreg}</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(entreg)}%;background:var(--green)"></div></div></div>`;
+    <div class="kpi-card">
+      <div class="kpi-label">Total de Itens</div>
+      <div class="kpi-value" style="color:var(--accent)">${total}</div>
+      <div class="kpi-sub">${ROWS.palcos.filter(r=>(r[3]||'').trim()!=='').length} palcos · ${ROWS.leds.filter(r=>(r[2]||'').trim()!=='').length} LEDs · ${ROWS.totens.filter(r=>(r[2]||'').trim()!=='').length} totens · ${ROWS.barralogos.filter(r=>(r[0]||'').trim()!=='').length} barras</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Em Produção</div>
+      <div class="kpi-value" style="color:var(--yellow)">${emProd}</div>
+      <div class="kpi-sub">Em Andamento + Em Revisão</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(emProd)}%;background:var(--yellow)"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Concluídos</div>
+      <div class="kpi-value" style="color:var(--green)">${conc}</div>
+      <div class="kpi-sub">${pct(conc)}% do total</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct(conc)}%;background:var(--green)"></div></div>
+    </div>`;
 
-  document.getElementById('status-legend').innerHTML=[
-    {label:'A Produzir',color:'var(--text-dim)',n:aProd},
-    {label:'Em Andamento',color:'var(--yellow)',n:emAnd},
-    {label:'Em Revisão',color:'var(--orange)',n:emRev},
-    {label:'Aprovado',color:'var(--blue)',n:aprov},
-    {label:'Entregue',color:'var(--green)',n:entreg},
-  ].map(l=>`<div class="legend-row"><div class="legend-label"><div class="legend-dot" style="background:${l.color}"></div>${l.label}</div><div class="legend-bar-wrap"><div class="legend-bar-fill" style="width:${pct(l.n)}%;background:${l.color}"></div></div><div class="legend-count" style="color:${l.color}">${l.n}</div></div>`).join('');
+  // Donut
+  const ctx=document.getElementById('donutChart');
+  if(donutChartInstance){ donutChartInstance.destroy(); donutChartInstance=null; }
+  const isDark=matchMedia('(prefers-color-scheme:dark)').matches;
+  donutChartInstance=new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:STATUS_LIST.map(s=>STATUS_PT[s]),
+      datasets:[{
+        data:STATUS_LIST.map(s=>count(s)),
+        backgroundColor:STATUS_LIST.map(s=>STATUS_COLORS[s]),
+        borderColor:isDark?'#111318':'#f3f4f6',
+        borderWidth:2,hoverOffset:4,
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'72%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:(c)=>` ${c.parsed} itens (${Math.round(c.parsed/(total||1)*100)}%)`}}}
+    }
+  });
+  document.getElementById('donut-center').innerHTML=`<div style="font-size:20px;font-weight:700;color:var(--text)">${total}</div><div style="font-size:10px;color:var(--text-dim)">itens</div>`;
 
-  const sections=[
-    {key:'palcos',label:'Palcos',filter:r=>(r[3]||'').trim()!==''},
-    {key:'leds',label:'LEDs Gerais',filter:r=>(r[2]||'').trim()!==''},
-    {key:'totens',label:'Totens Digitais',filter:r=>(r[2]||'').trim()!==''},
-    {key:'barralogos',label:'Barra de Logos',filter:r=>(r[0]||'').trim()!==''},
-  ];
-  document.getElementById('progress-by-section').innerHTML=sections.map(s=>{
+  // Donut legend
+  const leg=document.getElementById('donut-legend');
+  leg.innerHTML='';
+  STATUS_LIST.forEach(s=>{
+    const n=count(s), p=pct(n);
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:8px;';
+    row.innerHTML=`
+      <div style="width:8px;height:8px;border-radius:50%;background:${STATUS_COLORS[s]};flex-shrink:0;"></div>
+      <div style="font-size:12px;color:var(--text-muted);flex:1;">${STATUS_PT[s]}</div>
+      <div style="width:70px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${p}%;background:${STATUS_COLORS[s]};border-radius:2px;"></div></div>
+      <div style="font-size:13px;font-weight:600;color:${STATUS_COLORS[s]};min-width:24px;text-align:right;">${n}</div>`;
+    leg.appendChild(row);
+  });
+
+  // Progresso por seção
+  const secEl=document.getElementById('progress-by-section');
+  secEl.innerHTML=SECTIONS.map(s=>{
     const t=ROWS[s.key].filter(s.filter).length;
-    const d=ROWS[s.key].filter(s.filter).filter(r=>{ const st=getStatus(s.key,r); return st==='APROVADO'||st==='ENTREGUE'; }).length;
+    const d=ROWS[s.key].filter(s.filter).filter(r=>getStatus(s.key,r)==='CONCLUÍDO').length;
     const p=t>0?Math.round(d/t*100):0;
     const c=p>=75?'var(--green)':p>=40?'var(--yellow)':'var(--text-dim)';
-    return `<div style="margin-bottom:20px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:13px;color:var(--text-muted)">${s.label}</span><span style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:${c}">${d}/${t}</span></div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${p}%;background:${c};border-radius:3px;transition:width .6s ease;"></div></div></div>`;
-  }).join('')+`<div style="padding-top:12px;border-top:1px solid var(--border);"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:13px;font-weight:600">Total Geral</span><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:${done>0?'var(--green)':'var(--text-dim)'};">${pct(done)}%</span></div><div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${pct(done)}%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:4px;transition:width .6s ease;"></div></div></div>`;
+    return `<div style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:13px;color:var(--text-muted)">${s.label}</span>
+        <span style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:${c}">${d}/${t}</span>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${p}%;background:${c};border-radius:3px;transition:width .6s ease;"></div>
+      </div>
+    </div>`;
+  }).join('')+`
+    <div style="padding-top:12px;border-top:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:13px;font-weight:600;color:var(--text)">Total Geral</span>
+        <span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:${conc>0?'var(--green)':'var(--text-dim)'};">${pct(conc)}%</span>
+      </div>
+      <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:${pct(conc)}%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:4px;transition:width .6s ease;"></div>
+      </div>
+    </div>`;
+
+  // Tabela de atenção
+  const atEl=document.getElementById('atencao-body');
+  const atItems=allRows.filter(({r,s})=>{ const st=getStatus(s,r); return st==='EM ANDAMENTO'||st==='EM REVISÃO'; });
+  if(!atItems.length){
+    atEl.innerHTML=`<div style="padding:20px 0;text-align:center;font-size:13px;color:var(--text-dim);">Nenhum item em andamento ou revisão no momento.</div>`;
+  } else {
+    const secLabel={palcos:'Palcos',leds:'LEDs Gerais',totens:'Totens Digitais',barralogos:'Barra de Logos'};
+    atEl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead><tr>
+        <th style="text-align:left;padding:0 12px 8px 0;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-dim);">Item</th>
+        <th style="text-align:left;padding:0 12px 8px 0;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-dim);">Seção</th>
+        <th style="text-align:left;padding:0 0 8px 0;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-dim);">Status</th>
+      </tr></thead>
+      <tbody>${atItems.map(({r,s,label})=>{
+        const st=getStatus(s,r);
+        const cls=st==='EM ANDAMENTO'?'s-andamento':'s-revisao';
+        return `<tr>
+          <td style="padding:8px 12px 8px 0;border-top:1px solid var(--border);font-weight:500;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(label)}</td>
+          <td style="padding:8px 12px 8px 0;border-top:1px solid var(--border);"><span style="font-size:11px;color:var(--text-dim);background:var(--surface2);border-radius:3px;padding:2px 6px;">${secLabel[s]}</span></td>
+          <td style="padding:8px 0;border-top:1px solid var(--border);"><span class="status-badge ${cls}"><span class="status-dot"></span>${STATUS_PT[st]}</span></td>
+        </tr>`}).join('')}
+      </tbody></table>`;
+  }
 }
 
 function renderAll(){
