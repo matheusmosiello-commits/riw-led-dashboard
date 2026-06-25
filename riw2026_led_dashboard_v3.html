@@ -869,7 +869,17 @@ function renderPalcos() {
     return;
   }
 
-  // Colunas: Nº(0) | LOCAL(1) | Nº PALCO(2) | PALCO/LED(3) | DIMENSÕES(4) | M²(5) | PIXEL(6) | TIPO(7) | NAMING RIGHT(8) | PATS logos(9) | LINK LOGOS(10) | PATS video(11) | LINK CONTEÚDO(12) | FORNECEDOR(13) | STATUS(14)
+  // Colunas: Nº(0) | LOCAL(1) | Nº PALCO(2) | PALCO/LED(3) | DIMENSÕES(4) | M²(5) | PIXEL(6) | TIPO(7) | NAMING RIGHT(8) | PATS logos(9) | LINK LOGOS(10) | PATS video(11) | LINK CONTEÚDO(12) | FORNECEDOR(13)
+  // STATUS removido da planilha (índice 14) — controlado pelo app
+  // Filtra apenas linhas com PALCO/LED preenchido (índice 3)
+  rows = rows.filter(r => (r[3]||'').toString().trim() !== '');
+
+  if (!rows.length) {
+    document.getElementById('tbody-palcos').innerHTML =
+      `<tr><td colspan="15"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
+    return;
+  }
+
   document.getElementById('tbody-palcos').innerHTML = rows.map(r => `
     <tr>
       <td class="td-num">${col(r,0)}</td>
@@ -924,7 +934,17 @@ function renderLeds() {
     return;
   }
 
-  // Colunas: Nº(0) | LOCAL(1) | PALCO/LED(2) | DIMENSÕES(3) | M²(4) | PIXEL(5) | TIPO(6) | NAMING RIGHT(7) | PATS logos(8) | LINK LOGOS(9) | PATS video(10) | LINK CONTEÚDO(11) | FORNECEDOR(12) | STATUS(13)
+  // Colunas: Nº(0) | LOCAL(1) | PALCO/LED(2) | DIMENSÕES(3) | M²(4) | PIXEL(5) | TIPO(6) | NAMING RIGHT(7) | PATS logos(8) | LINK LOGOS(9) | PATS video(10) | LINK CONTEÚDO(11) | FORNECEDOR(12)
+  // STATUS removido da planilha (índice 13) — controlado pelo app
+  // Filtra apenas linhas com PALCO/LED preenchido (índice 2)
+  rows = rows.filter(r => (r[2]||'').toString().trim() !== '');
+
+  if (!rows.length) {
+    document.getElementById('tbody-leds').innerHTML =
+      `<tr><td colspan="14"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
+    return;
+  }
+
   document.getElementById('tbody-leds').innerHTML = rows.map(r => `
     <tr>
       <td class="td-num">${col(r,0)}</td>
@@ -978,7 +998,17 @@ function renderTotens() {
     return;
   }
 
-  // Colunas: Nº(0) | LOCAL(1) | NOME TOTEM(2) | DIMENSÕES(3) | PIXEL(4) | TIPO(5) | NAMING RIGHT(6) | PATS logos(7) | PATS video(8) | LINK CONTEÚDO(9) | FORNECEDOR(10) | STATUS(11)
+  // Colunas: Nº(0) | LOCAL(1) | NOME TOTEM(2) | DIMENSÕES(3) | PIXEL(4) | TIPO(5) | NAMING RIGHT(6) | PATS logos(7) | PATS video(8) | LINK CONTEÚDO(9) | FORNECEDOR(10)
+  // STATUS removido da planilha (índice 11) — controlado pelo app
+  // Filtra apenas linhas com NOME DO TOTEM preenchido (índice 2)
+  rows = rows.filter(r => (r[2]||'').toString().trim() !== '');
+
+  if (!rows.length) {
+    document.getElementById('tbody-totens').innerHTML =
+      `<tr><td colspan="12"><div class="empty-state"><h3>Nenhum resultado encontrado</h3></div></td></tr>`;
+    return;
+  }
+
   document.getElementById('tbody-totens').innerHTML = rows.map(r => `
     <tr>
       <td class="td-num">${col(r,0)}</td>
